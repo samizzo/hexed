@@ -1,0 +1,8 @@
+.vs/*
+.DS_Store
+Debug/*
+Release/*
+*.vtcache
+*.user
+*.suo
+*.sdf
