@@ -44,7 +44,7 @@ void HexView::OnWindowRefreshed()
         WORD colour = 0;
         if (offset >> 4 == m_selected >> 4)
         {
-            colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+            colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY | COMMON_LVB_REVERSE_VIDEO;
         }
         else
         {
@@ -129,6 +129,40 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
         case VK_RIGHT:
         {
             m_selected = min(m_selected + 1, m_fileSize - 1);
+            Window::Refresh();
+            break;
+        }
+
+        case VK_UP:
+        {
+            if (m_selected >> 4 != 0)
+            {
+                m_selected = max(m_selected - 16, 0);
+                Window::Refresh();
+            }
+            break;
+        }
+
+        case VK_DOWN:
+        {
+            if (m_selected >> 4 != m_fileSize >> 4)
+            {
+                m_selected = min(m_selected + 16, m_fileSize - 1);
+                Window::Refresh();
+            }
+            break;
+        }
+
+        case VK_HOME:
+        {
+            m_selected = 0;
+            Window::Refresh();
+            break;
+        }
+
+        case VK_END:
+        {
+            m_selected = m_fileSize - 1;
             Window::Refresh();
             break;
         }
