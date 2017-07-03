@@ -26,7 +26,6 @@ void Window::OnWindowRefreshed()
 	s_consoleBuffer->FillLine(0, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
     const char* filename = Path::FindFileName(m_filename);
 	s_consoleBuffer->Write(2, 0, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, filename);
-	s_consoleBuffer->FillLine(m_height - 1, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
 }
 
 void Window::OnWindowResized(int width, int height)
