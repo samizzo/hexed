@@ -7,6 +7,7 @@ static CONSOLE_SCREEN_BUFFER_INFOEX s_prevInfo;
 static DWORD s_prevMode;
 static CHAR_INFO* s_prevConsoleOutput;
 static COORD s_prevSize;
+static CONSOLE_CURSOR_INFO s_prevCursor;
 
 void SaveConsole(HANDLE stdoutHandle, HANDLE stdinHandle)
 {
@@ -35,6 +36,12 @@ void SaveConsole(HANDLE stdoutHandle, HANDLE stdinHandle)
     rect.Right = s_prevSize.X;
     rect.Bottom = s_prevSize.Y;
     ReadConsoleOutput(stdoutHandle, s_prevConsoleOutput, s_prevSize, coord, &rect);
+
+    GetConsoleCursorInfo(stdoutHandle, &s_prevCursor);
+
+    CONSOLE_CURSOR_INFO info = s_prevCursor;
+    info.bVisible = FALSE;
+    SetConsoleCursorInfo(stdoutHandle, &info);
 }
 
 void RestoreConsole(HANDLE stdoutHandle, HANDLE stdinHandle)
@@ -56,6 +63,8 @@ void RestoreConsole(HANDLE stdoutHandle, HANDLE stdinHandle)
         delete[] s_prevConsoleOutput;
         s_prevConsoleOutput = 0;
     }
+
+    SetConsoleCursorInfo(stdoutHandle, &s_prevCursor);
 
     {
         SMALL_RECT& rect = s_prevInfo.srWindow;
