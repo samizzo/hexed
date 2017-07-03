@@ -35,6 +35,9 @@ void HexView::Draw()
 
     for (int j = 0; j < m_height; j++)
     {
+        if (offset >= m_bufferSize)
+            break;
+
         int y = 1 + j;
         int x = 1;
         m_consoleBuffer->Write(1, y, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY, "%08X", offset);
@@ -42,7 +45,10 @@ void HexView::Draw()
 
         for (int i = 0; i < 16; i++, offset++)
         {
-            char c = m_buffer[offset];
+            if (offset >= m_bufferSize)
+                break;
+
+            unsigned char c = m_buffer[offset];
 
             int xx = x + (i * 3);
             m_consoleBuffer->Write(xx, y, FOREGROUND_GREEN, "%02X", c);
@@ -68,11 +74,11 @@ void HexView::CacheFile()
         return;
 
     delete[] m_buffer;
-    //int numBytesToCache = m_offset 
-    m_buffer = new char[m_height * 16];
-    memset(m_buffer, 0, m_height * 16);
 
-    m_offset = 0;
+    m_bufferSize = m_offset + (m_height * 16) > m_fileSize ? m_fileSize - m_offset : m_height * 16;
+    m_buffer = new unsigned char[m_bufferSize];
+    memset(m_buffer, 0, m_bufferSize);
+
     fseek(m_fp, m_offset, SEEK_SET);
-    fread_s(m_buffer, m_height * 16, 1, m_height * 16, m_fp);
+    fread_s(m_buffer, m_bufferSize, 1, m_bufferSize, m_fp);
 }

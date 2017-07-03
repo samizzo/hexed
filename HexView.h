@@ -16,7 +16,8 @@ class HexView : public Window
         void CacheFile();
 
         FILE* m_fp;
-        char* m_buffer;
+        unsigned char* m_buffer;
+        int m_bufferSize;
         int m_offset;
         int m_fileSize;
 };
