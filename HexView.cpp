@@ -28,7 +28,7 @@ void HexView::OnWindowRefreshed()
 {
     s_consoleBuffer->FillRect(0, 1, m_width, m_height, ' ', FOREGROUND_RED);
     s_consoleBuffer->FillLine(m_height + 1, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
-    s_consoleBuffer->Write(2, m_height + 1, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08x / %08x", m_selected, m_fileSize - 1);
+    s_consoleBuffer->Write(2, m_height + 1, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08X / %08X", m_selected, m_fileSize - 1);
 
     if (!m_fp)
         return;
