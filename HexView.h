@@ -9,8 +9,8 @@ class HexView : public Window
         HexView(ConsoleBuffer* consoleBuffer, const char* filename);
         ~HexView();
 
-        virtual void Draw();
-        virtual void OnWindowResize(int newWidth, int newHeight);
+        virtual void OnWindowRefreshed();
+        virtual void OnWindowResized(int newWidth, int newHeight);
 
     private:
         void CacheFile();

@@ -73,14 +73,10 @@ int main(int argc, char** argv)
             {
                 width = newWidth;
                 height = newHeight;
-
                 buffer.OnWindowResize(width, height);
 
-                window.OnWindowResize(width, height);
-                window.Draw();
-
-                hexView.OnWindowResize(width, height);
-                hexView.Draw();
+                Window::Resize(width, height);
+                Window::Refresh();
 
                 buffer.Flush();
             }

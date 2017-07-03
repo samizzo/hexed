@@ -23,7 +23,7 @@ HexView::~HexView()
         fclose(m_fp);
 }
 
-void HexView::Draw()
+void HexView::OnWindowRefreshed()
 {
     m_consoleBuffer->FillRect(0, 1, m_width, m_height, ' ', FOREGROUND_RED);
 
@@ -61,10 +61,10 @@ void HexView::Draw()
     }
 }
 
-void HexView::OnWindowResize(int width, int height)
+void HexView::OnWindowResized(int width, int height)
 {
     height -= 2;
-    Window::OnWindowResize(width, height);
+    Window::OnWindowResized(width, height);
     CacheFile();
 }
 
