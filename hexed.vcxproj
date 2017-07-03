@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleBuffer.cpp" />
+    <ClCompile Include="Error.cpp" />
     <ClCompile Include="HexView.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
@@ -150,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleBuffer.h" />
+    <ClInclude Include="Error.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="HexView.h" />
     <ClInclude Include="Window.h" />

@@ -2,42 +2,19 @@
 #include "HexView.h"
 #include <stdio.h>
 #include <string>
+#include "Error.h"
 
 using namespace std;
 
+bool s_running = false;
+
 static DWORD s_prevMode;
-static bool s_running = false;
 static HANDLE s_stdoutHandle;
 static HANDLE s_stdinHandle;
 static CONSOLE_SCREEN_BUFFER_INFOEX s_prevInfo;
 
-string FormatErrorMessage(DWORD ErrorCode)
-{
-    TCHAR* pMsgBuf = NULL;
-    DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, ErrorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        reinterpret_cast<LPTSTR>(&pMsgBuf), 0, NULL);
-    if (!nMsgLen)
-        return "FormatMessage failed";
-    string msg(pMsgBuf);
-    LocalFree(pMsgBuf);
-    return msg;
-}
-
-void Error(const char* message)
-{
-    printf("Error: %s\n", message);
-    DWORD lastError = GetLastError();
-    string errorString = FormatErrorMessage(lastError);
-    printf("LastError: %s\n", errorString.c_str());
-    if (!s_running)
-        ExitProcess(1);
-}
-
 void ProcessInput(const INPUT_RECORD& inputRecord);
 void ProcessKeyEvent(const KEY_EVENT_RECORD& ker);
-void OnWindowResized(int newWidth, int newHeight);
 void RemapColours();
 void SaveConsole();
 void RestoreConsole();
@@ -110,7 +87,6 @@ int main(int argc, char** argv)
                 info = newInfo;
                 width = newWidth;
                 height = newHeight;
-                OnWindowResized(newWidth, newHeight);
                 windowResized = true;
             }
         }
@@ -129,7 +105,6 @@ int main(int argc, char** argv)
             hexView.Draw();
 
             buffer.Flush();
-
             windowResized = false;
         }
     }
@@ -155,10 +130,6 @@ void ProcessKeyEvent(const KEY_EVENT_RECORD& ker)
     {
         s_running = false;
     }
-}
-
-void OnWindowResized(int newWidth, int newHeight)
-{
 }
 
 void RemapColours()
