@@ -24,15 +24,24 @@
     <ClCompile Include="HexView.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Debug.h">
+    <ClInclude Include="HexView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HexView.h">
+    <ClInclude Include="Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

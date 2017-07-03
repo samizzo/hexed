@@ -72,11 +72,13 @@ int main(int argc, char** argv)
 
     RemapColours();
 
-    int width = info.srWindow.Right - info.srWindow.Left;
+    int width = info.srWindow.Right - info.srWindow.Left + 1;
     int height = info.srWindow.Bottom - info.srWindow.Top + 1;
 
-    Window window;
-    HexView hexView;
+    ConsoleBuffer buffer(s_stdoutHandle);
+    Window window(&buffer);
+    HexView hexView(&buffer);
+
     hexView.SetPosition(0, 1);
 
     bool windowResized = true;
@@ -101,7 +103,7 @@ int main(int argc, char** argv)
         CONSOLE_SCREEN_BUFFER_INFO newInfo;
         if (GetConsoleScreenBufferInfo(s_stdoutHandle, &newInfo))
         {
-            int newWidth = newInfo.srWindow.Right - newInfo.srWindow.Left;
+            int newWidth = newInfo.srWindow.Right - newInfo.srWindow.Left + 1;
             int newHeight = newInfo.srWindow.Bottom - newInfo.srWindow.Top + 1;
             if (newWidth != width || newHeight != height)
             {
@@ -115,13 +117,18 @@ int main(int argc, char** argv)
 
         if (windowResized)
         {
+            // TODO: Clear entire buffer before drawing?
+            // FarManager scrolls to the bottom before drawing.
+
+            buffer.OnWindowResize(width, height);
+
             window.OnWindowResize(width, height);
             window.Draw();
-            window.Flush(s_stdoutHandle);
 
             hexView.OnWindowResize(width, height);
             hexView.Draw();
-            hexView.Flush(s_stdoutHandle);
+
+            buffer.Flush();
 
             windowResized = false;
         }
@@ -180,6 +187,11 @@ void RemapColours()
     info.ColorTable[14] = 0x000089b5;
     info.ColorTable[15] = 0x00e3f6fd;
 
+    // HACK: Workaround for a bug where SetConsoleScreenBufferInfoEx seems to interpret
+    // the right and bottom as exclusive, so the window size shrinks.
+    info.srWindow.Right += 1;
+    info.srWindow.Bottom += 1;
+
     if (!SetConsoleScreenBufferInfoEx(s_stdoutHandle, &info))
         Error("Failed to set console info");
 }
@@ -197,6 +209,8 @@ void SaveConsole()
 
 void RestoreConsole()
 {
+    s_prevInfo.srWindow.Right += 1;
+    s_prevInfo.srWindow.Bottom += 1;
     SetConsoleScreenBufferInfoEx(s_stdoutHandle, &s_prevInfo);
     SetConsoleMode(s_stdinHandle, s_prevMode);
 }

@@ -1,20 +1,15 @@
 #pragma once
 
 #include <Windows.h>
+#include "ConsoleBuffer.h"
 
 class Window
 {
     public:
-		Window();
-        ~Window();
+		Window(ConsoleBuffer* consoleBuffer);
 
         virtual void Draw();
-
-		void Write(int x, int y, const char* text, WORD attributes);
-		void FillLine(int y, char c, WORD attributes);
-        void Flush(HANDLE handle);
-
-		virtual void OnWindowResize(int newWidth, int newHeight);
+		virtual void OnWindowResize(int width, int height);
 
         void SetPosition(int x, int y);
 
@@ -23,8 +18,7 @@ class Window
         int m_height;
         int m_x;
         int m_y;
-
-        CHAR_INFO* m_buffer;
+        ConsoleBuffer* m_consoleBuffer;
 };
 
 inline void Window::SetPosition(int x, int y)

@@ -1,17 +1,18 @@
 #include "HexView.h"
+#include "Log.h"
+
+HexView::HexView(ConsoleBuffer* consoleBuffer) : Window(consoleBuffer)
+{
+}
 
 void HexView::Draw()
 {
-    //Window::Draw();
-    for (int i = 0; i < m_width * m_height; i++)
-    {
-        m_buffer[i].Attributes = FOREGROUND_RED;
-        m_buffer[i].Char.AsciiChar = '.';
-    }
+    m_consoleBuffer->FillRect(0, 1, m_width, m_height, '.', FOREGROUND_RED);
 }
 
 void HexView::OnWindowResize(int newWidth, int newHeight)
 {
-    newHeight--;
+    newHeight -= 2;
+    LogDebug("width=%i, height=%i\n", newWidth, newHeight);
     Window::OnWindowResize(newWidth, newHeight);
 }
