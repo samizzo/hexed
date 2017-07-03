@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <assert.h>
 
-HexView::HexView(ConsoleBuffer* consoleBuffer, const char* filename) : Window(consoleBuffer, filename)
+HexView::HexView(const char* filename) : Window(filename)
 {
     m_fp = 0;
     m_buffer = 0;
     m_offset = 0;
+    m_selected = 0;
     fopen_s(&m_fp, filename, "rb");
     if (m_fp)
     {
@@ -25,7 +26,7 @@ HexView::~HexView()
 
 void HexView::OnWindowRefreshed()
 {
-    m_consoleBuffer->FillRect(0, 1, m_width, m_height, ' ', FOREGROUND_RED);
+    s_consoleBuffer->FillRect(0, 1, m_width, m_height, ' ', FOREGROUND_RED);
 
     if (!m_fp)
         return;
@@ -40,7 +41,17 @@ void HexView::OnWindowRefreshed()
 
         int y = 1 + j;
         int x = 1;
-        m_consoleBuffer->Write(1, y, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY, "%08X", offset);
+        WORD colour = 0;
+        if (offset >> 4 == m_selected >> 4)
+        {
+            colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+        }
+        else
+        {
+            colour = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+        }
+
+        s_consoleBuffer->Write(1, y, colour, "%08X", offset);
         x += 9;
 
         for (int i = 0; i < 16; i++, offset++)
@@ -50,13 +61,31 @@ void HexView::OnWindowRefreshed()
 
             unsigned char c = m_buffer[offset];
 
+            if (offset == m_selected)
+            {
+                colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+            }
+            else
+            {
+                colour = FOREGROUND_GREEN;
+            }
+
             int xx = x + (i * 3);
-            m_consoleBuffer->Write(xx, y, FOREGROUND_GREEN, "%02X", c);
+            s_consoleBuffer->Write(xx, y, colour, "%02X", c);
 
             xx = x + (16 * 3) + i;
             if (!isprint(c))
                 c = '.';
-            m_consoleBuffer->Write(xx, y, FOREGROUND_GREEN, "%c", c);
+
+            if (offset == m_selected)
+            {
+                colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+            }
+            else
+            {
+                colour = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+            }
+            s_consoleBuffer->Write(xx, y, colour, "%c", c);
         }
     }
 }
@@ -81,4 +110,27 @@ void HexView::CacheFile()
 
     fseek(m_fp, m_offset, SEEK_SET);
     fread_s(m_buffer, m_bufferSize, 1, m_bufferSize, m_fp);
+}
+
+void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
+{
+    if (!ker.bKeyDown)
+        return;
+
+    switch (ker.wVirtualKeyCode)
+    {
+        case VK_LEFT:
+        {
+            m_selected = max(m_selected - 1, 0);
+            Window::Refresh();
+            break;
+        }
+
+        case VK_RIGHT:
+        {
+            m_selected = min(m_selected + 1, m_fileSize - 1);
+            Window::Refresh();
+            break;
+        }
+    }
 }

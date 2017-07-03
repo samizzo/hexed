@@ -8,13 +8,14 @@
 class Window
 {
     public:
-		Window(ConsoleBuffer* consoleBuffer, const char* filename);
+		Window(const char* filename);
         ~Window();
 
         virtual void OnWindowRefreshed();
 		virtual void OnWindowResized(int width, int height);
-        virtual void OnKeyEvent(const KEY_EVENT_RECORD& ker) { };
+        virtual void OnKeyEvent(const KEY_EVENT_RECORD& ker);
 
+        static void SetConsoleBuffer(ConsoleBuffer* buffer);
         static void Add(Window* window);
         static void Remove(Window* window);
         static void Resize(int width, int height);
@@ -25,11 +26,17 @@ class Window
         const char* m_filename;
         int m_width;
         int m_height;
-        ConsoleBuffer* m_consoleBuffer;
+
+        static ConsoleBuffer* s_consoleBuffer;
 
     private:
         static std::vector<Window*> s_windows;
 };
+
+inline void Window::SetConsoleBuffer(ConsoleBuffer* buffer)
+{
+    s_consoleBuffer = buffer;
+}
 
 inline void Window::Add(Window* window)
 {
@@ -44,6 +51,7 @@ inline void Window::Remove(Window* window)
 
 inline void Window::Resize(int width, int height)
 {
+    s_consoleBuffer->OnWindowResize(width, height);
     for (size_t i = 0; i < s_windows.size(); i++)
         s_windows[i]->OnWindowResized(width, height);
 }
@@ -52,10 +60,15 @@ inline void Window::Refresh()
 {
     for (size_t i = 0; i < s_windows.size(); i++)
         s_windows[i]->OnWindowRefreshed();
+    s_consoleBuffer->Flush();
 }
 
 inline void Window::KeyEvent(const KEY_EVENT_RECORD& ker)
 {
     for (size_t i = 0; i < s_windows.size(); i++)
         s_windows[i]->OnKeyEvent(ker);
+}
+
+inline void Window::OnKeyEvent(const KEY_EVENT_RECORD& ker)
+{
 }

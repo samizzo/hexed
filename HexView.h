@@ -6,11 +6,12 @@
 class HexView : public Window
 {
     public:
-        HexView(ConsoleBuffer* consoleBuffer, const char* filename);
+        HexView(const char* filename);
         ~HexView();
 
         virtual void OnWindowRefreshed();
         virtual void OnWindowResized(int newWidth, int newHeight);
+        virtual void OnKeyEvent(const KEY_EVENT_RECORD& ker);
 
     private:
         void CacheFile();
@@ -19,5 +20,6 @@ class HexView : public Window
         unsigned char* m_buffer;
         int m_bufferSize;
         int m_offset;
+        int m_selected;
         int m_fileSize;
 };

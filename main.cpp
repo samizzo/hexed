@@ -10,7 +10,6 @@ using namespace std;
 bool s_running = false;
 
 void ProcessInput(const INPUT_RECORD& inputRecord);
-void ProcessKeyEvent(const KEY_EVENT_RECORD& ker);
 void RemapColours(HANDLE stdoutHandle);
 
 int main(int argc, char** argv)
@@ -43,8 +42,9 @@ int main(int argc, char** argv)
     int height = 0;
 
     ConsoleBuffer buffer(stdoutHandle);
-    Window window(&buffer, argv[1]);
-    HexView hexView(&buffer, argv[1]);
+    Window::SetConsoleBuffer(&buffer);
+    Window window(argv[1]);
+    HexView hexView(argv[1]);
 
     s_running = true;
 
@@ -73,12 +73,8 @@ int main(int argc, char** argv)
             {
                 width = newWidth;
                 height = newHeight;
-                buffer.OnWindowResize(width, height);
-
                 Window::Resize(width, height);
                 Window::Refresh();
-
-                buffer.Flush();
             }
         }
     }
@@ -93,18 +89,11 @@ void ProcessInput(const INPUT_RECORD& inputRecord)
         case KEY_EVENT:
         {
             const KEY_EVENT_RECORD& ker = inputRecord.Event.KeyEvent;
-            ProcessKeyEvent(ker);
+            if (ker.wVirtualKeyCode == VK_ESCAPE && !ker.bKeyDown)
+                s_running = false;
             Window::KeyEvent(ker);
             break;
         }
-    }
-}
-
-void ProcessKeyEvent(const KEY_EVENT_RECORD& ker)
-{
-    if (ker.wVirtualKeyCode == VK_ESCAPE && !ker.bKeyDown)
-    {
-        s_running = false;
     }
 }
 
