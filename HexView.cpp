@@ -157,14 +157,30 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
 
         case VK_HOME:
         {
-            m_selected &= ~15;
+            DWORD ctrl = ker.dwControlKeyState;
+            if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
+            {
+                m_selected = 0;
+            }
+            else
+            {
+                m_selected &= ~15;
+            }
             Window::Refresh();
             break;
         }
 
         case VK_END:
         {
-            m_selected = min(m_selected | 15, m_fileSize - 1);
+            DWORD ctrl = ker.dwControlKeyState;
+            if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
+            {
+                m_selected = m_fileSize - 1;
+            }
+            else
+            {
+                m_selected = min(m_selected | 15, m_fileSize - 1);
+            }
             Window::Refresh();
             break;
         }
