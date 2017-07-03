@@ -43,10 +43,8 @@ int main(int argc, char** argv)
     int height = 0;
 
     ConsoleBuffer buffer(stdoutHandle);
-    Window window(&buffer);
-    HexView hexView(&buffer);
-
-    hexView.SetPosition(0, 1);
+    Window window(&buffer, argv[1]);
+    HexView hexView(&buffer, argv[1]);
 
     s_running = true;
 
@@ -75,9 +73,6 @@ int main(int argc, char** argv)
             {
                 width = newWidth;
                 height = newHeight;
-
-                // TODO: Clear entire buffer before drawing?
-                // FarManager scrolls to the bottom before drawing.
 
                 buffer.OnWindowResize(width, height);
 

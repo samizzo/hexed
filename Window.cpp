@@ -1,13 +1,13 @@
 #include "Window.h"
 #include <assert.h>
+#include "Path.h"
 
-Window::Window(ConsoleBuffer* consoleBuffer)
+Window::Window(ConsoleBuffer* consoleBuffer, const char* filename)
 {
+    m_filename = filename;
 	m_width = 0;
 	m_height = 0;
     m_consoleBuffer = consoleBuffer;
-    m_x = 0;
-    m_y = 0;
 }
 
 void Window::Draw()
@@ -16,7 +16,8 @@ void Window::Draw()
 
     m_consoleBuffer->Clear();
 	m_consoleBuffer->FillLine(0, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
-	m_consoleBuffer->Write(2, 0, "hexed.exe", BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
+    const char* filename = Path::FindFileName(m_filename);
+	m_consoleBuffer->Write(2, 0, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, filename);
 	m_consoleBuffer->FillLine(m_height - 1, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
 }
 

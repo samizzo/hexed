@@ -7,7 +7,7 @@ class ConsoleBuffer
     public:
         ConsoleBuffer(HANDLE stdoutHandle);
 
-        void Write(int x, int y, const char* text, WORD attributes);
+        void Write(int x, int y, WORD attributes, const char* format, ...);
         void FillLine(int y, char c, WORD attributes);
         void FillRect(int x, int y, int width, int height, char c, WORD attributes);
         void Clear();

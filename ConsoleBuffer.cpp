@@ -1,5 +1,7 @@
 #include "ConsoleBuffer.h"
 #include <assert.h>
+#include <stdio.h>
+#include <malloc.h>
 
 ConsoleBuffer::ConsoleBuffer(HANDLE stdoutHandle)
 {
@@ -9,19 +11,26 @@ ConsoleBuffer::ConsoleBuffer(HANDLE stdoutHandle)
     m_buffer = 0;
 }
 
-void ConsoleBuffer::Write(int x, int y, const char* text, WORD attributes)
+void ConsoleBuffer::Write(int x, int y, WORD attributes, const char* format, ...)
 {
     assert(m_buffer != 0);
     assert(m_width > 0);
     assert(m_height > 0);
 
+    va_list args;
+    va_start(args, format);
+    int count = _vscprintf(format, args);
+    char* buffer = (char*)_alloca(count + 1);
+    vsprintf_s(buffer, count + 1, format, args);
+
     int offset = x + (y * m_width);
-    size_t length = strlen(text);
-    for (size_t i = 0; i < length; i++, offset++)
+    for (int i = 0; i < count; i++, offset++)
     {
-        m_buffer[offset].Char.AsciiChar = text[i];
+        m_buffer[offset].Char.AsciiChar = buffer[i];
         m_buffer[offset].Attributes = attributes;
     }
+
+    va_end(args);
 }
 
 void ConsoleBuffer::FillLine(int y, char c, WORD attributes)

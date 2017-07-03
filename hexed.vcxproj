@@ -147,6 +147,7 @@
     <ClCompile Include="HexView.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="SaveRestoreConsole.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -155,6 +156,7 @@
     <ClInclude Include="Error.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="HexView.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="SaveRestoreConsole.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
