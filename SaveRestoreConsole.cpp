@@ -40,20 +40,6 @@ void SaveConsole(HANDLE stdoutHandle, HANDLE stdinHandle)
 void RestoreConsole(HANDLE stdoutHandle, HANDLE stdinHandle)
 {
     {
-        SMALL_RECT& rect = s_prevInfo.srWindow;
-        int width = rect.Right - rect.Left + 1;
-        int height = rect.Bottom - rect.Top + 1;
-
-        // HACK: Add 1 to work around a bug where the window shrinks otherwise.
-        rect.Left = 0;
-        rect.Right = width;
-        rect.Top = 0;
-        rect.Bottom = height;
-        SetConsoleScreenBufferInfoEx(stdoutHandle, &s_prevInfo);
-        SetConsoleMode(stdinHandle, s_prevMode);
-    }
-
-    {
         // Restore the old output in the window.
         assert(s_prevConsoleOutput != 0);
         COORD coord;
@@ -69,5 +55,19 @@ void RestoreConsole(HANDLE stdoutHandle, HANDLE stdinHandle)
 
         delete[] s_prevConsoleOutput;
         s_prevConsoleOutput = 0;
+    }
+
+    {
+        SMALL_RECT& rect = s_prevInfo.srWindow;
+        int width = rect.Right - rect.Left + 1;
+        int height = rect.Bottom - rect.Top + 1;
+
+        // HACK: Add 1 to work around a bug where the window shrinks otherwise.
+        rect.Left = 0;
+        rect.Right = width;
+        rect.Top = 0;
+        rect.Bottom = height;
+        SetConsoleScreenBufferInfoEx(stdoutHandle, &s_prevInfo);
+        SetConsoleMode(stdinHandle, s_prevMode);
     }
 }
