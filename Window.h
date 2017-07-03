@@ -13,11 +13,13 @@ class Window
 
         virtual void OnWindowRefreshed();
 		virtual void OnWindowResized(int width, int height);
+        virtual void OnKeyEvent(const KEY_EVENT_RECORD& ker) { };
 
         static void Add(Window* window);
         static void Remove(Window* window);
         static void Resize(int width, int height);
         static void Refresh();
+        static void KeyEvent(const KEY_EVENT_RECORD& ker);
 
     protected:
         const char* m_filename;
@@ -50,4 +52,10 @@ inline void Window::Refresh()
 {
     for (size_t i = 0; i < s_windows.size(); i++)
         s_windows[i]->OnWindowRefreshed();
+}
+
+inline void Window::KeyEvent(const KEY_EVENT_RECORD& ker)
+{
+    for (size_t i = 0; i < s_windows.size(); i++)
+        s_windows[i]->OnKeyEvent(ker);
 }

@@ -92,7 +92,9 @@ void ProcessInput(const INPUT_RECORD& inputRecord)
     {
         case KEY_EVENT:
         {
-            ProcessKeyEvent(inputRecord.Event.KeyEvent);
+            const KEY_EVENT_RECORD& ker = inputRecord.Event.KeyEvent;
+            ProcessKeyEvent(ker);
+            Window::KeyEvent(ker);
             break;
         }
     }
