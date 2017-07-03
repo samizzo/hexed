@@ -76,7 +76,7 @@ void HexView::OnWindowRefreshed()
             s_consoleBuffer->Write(xx, y, colour, "%02X", c);
 
             xx = x + (16 * 3) + i;
-            if (!isprint(c))
+            if (c < ' ')
                 c = '.';
 
             if (offset == m_selected)
