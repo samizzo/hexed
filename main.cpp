@@ -3,21 +3,15 @@
 #include <stdio.h>
 #include <string>
 #include "Error.h"
+#include "SaveRestoreConsole.h"
 
 using namespace std;
 
 bool s_running = false;
 
-static DWORD s_prevMode;
-static HANDLE s_stdoutHandle;
-static HANDLE s_stdinHandle;
-static CONSOLE_SCREEN_BUFFER_INFOEX s_prevInfo;
-
 void ProcessInput(const INPUT_RECORD& inputRecord);
 void ProcessKeyEvent(const KEY_EVENT_RECORD& ker);
-void RemapColours();
-void SaveConsole();
-void RestoreConsole();
+void RemapColours(HANDLE stdoutHandle);
 
 int main(int argc, char** argv)
 {
@@ -27,48 +21,43 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    s_stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
-    if (s_stdinHandle == INVALID_HANDLE_VALUE)
+    HANDLE stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
+    if (stdinHandle == INVALID_HANDLE_VALUE)
         Error("Couldn't get input handle");
 
-    s_stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (s_stdoutHandle == INVALID_HANDLE_VALUE)
+    HANDLE stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (stdoutHandle == INVALID_HANDLE_VALUE)
         Error("Couldn't get output handle");
 
-    SaveConsole();
+    SaveConsole(stdoutHandle, stdinHandle);
 
-    if (!SetConsoleMode(s_stdinHandle, ENABLE_WINDOW_INPUT))
+    if (!SetConsoleMode(stdinHandle, ENABLE_WINDOW_INPUT))
         Error("Couldn't set console mode");
 
     static const int INPUT_BUFFER_SIZE = 128;
     INPUT_RECORD inputBuffer[INPUT_BUFFER_SIZE];
 
-    CONSOLE_SCREEN_BUFFER_INFO info;
-    if (!GetConsoleScreenBufferInfo(s_stdoutHandle, &info))
-        Error("Couldn't get console screen buffer info");
+    RemapColours(stdoutHandle);
 
-    RemapColours();
+    int width = 0;
+    int height = 0;
 
-    int width = info.srWindow.Right - info.srWindow.Left + 1;
-    int height = info.srWindow.Bottom - info.srWindow.Top + 1;
-
-    ConsoleBuffer buffer(s_stdoutHandle);
+    ConsoleBuffer buffer(stdoutHandle);
     Window window(&buffer);
     HexView hexView(&buffer);
 
     hexView.SetPosition(0, 1);
 
-    bool windowResized = true;
     s_running = true;
 
     while (s_running)
     {
         DWORD numEventsAvailable;
-        GetNumberOfConsoleInputEvents(s_stdinHandle, &numEventsAvailable);
+        GetNumberOfConsoleInputEvents(stdinHandle, &numEventsAvailable);
         if (numEventsAvailable > 0)
         {
             DWORD numEventsRead;
-            ReadConsoleInput(s_stdinHandle, inputBuffer, INPUT_BUFFER_SIZE, &numEventsRead);
+            ReadConsoleInput(stdinHandle, inputBuffer, INPUT_BUFFER_SIZE, &numEventsRead);
 
             for (DWORD i = 0; i < numEventsRead; i++)
             {
@@ -77,39 +66,33 @@ int main(int argc, char** argv)
             }
         }
 
-        CONSOLE_SCREEN_BUFFER_INFO newInfo;
-        if (GetConsoleScreenBufferInfo(s_stdoutHandle, &newInfo))
+        CONSOLE_SCREEN_BUFFER_INFO info;
+        if (GetConsoleScreenBufferInfo(stdoutHandle, &info))
         {
-            int newWidth = newInfo.srWindow.Right - newInfo.srWindow.Left + 1;
-            int newHeight = newInfo.srWindow.Bottom - newInfo.srWindow.Top + 1;
+            int newWidth = info.srWindow.Right - info.srWindow.Left + 1;
+            int newHeight = info.srWindow.Bottom - info.srWindow.Top + 1;
             if (newWidth != width || newHeight != height)
             {
-                info = newInfo;
                 width = newWidth;
                 height = newHeight;
-                windowResized = true;
+
+                // TODO: Clear entire buffer before drawing?
+                // FarManager scrolls to the bottom before drawing.
+
+                buffer.OnWindowResize(width, height);
+
+                window.OnWindowResize(width, height);
+                window.Draw();
+
+                hexView.OnWindowResize(width, height);
+                hexView.Draw();
+
+                buffer.Flush();
             }
-        }
-
-        if (windowResized)
-        {
-            // TODO: Clear entire buffer before drawing?
-            // FarManager scrolls to the bottom before drawing.
-
-            buffer.OnWindowResize(width, height);
-
-            window.OnWindowResize(width, height);
-            window.Draw();
-
-            hexView.OnWindowResize(width, height);
-            hexView.Draw();
-
-            buffer.Flush();
-            windowResized = false;
         }
     }
 
-    RestoreConsole();
+    RestoreConsole(stdoutHandle, stdoutHandle);
 }
 
 void ProcessInput(const INPUT_RECORD& inputRecord)
@@ -132,11 +115,11 @@ void ProcessKeyEvent(const KEY_EVENT_RECORD& ker)
     }
 }
 
-void RemapColours()
+void RemapColours(HANDLE stdoutHandle)
 {
     CONSOLE_SCREEN_BUFFER_INFOEX info;
     info.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
-    if (!GetConsoleScreenBufferInfoEx(s_stdoutHandle, &info))
+    if (!GetConsoleScreenBufferInfoEx(stdoutHandle, &info))
         Error("Failed to get console info");
 
     // TODO: Configurable colours.
@@ -163,25 +146,6 @@ void RemapColours()
     info.srWindow.Right += 1;
     info.srWindow.Bottom += 1;
 
-    if (!SetConsoleScreenBufferInfoEx(s_stdoutHandle, &info))
+    if (!SetConsoleScreenBufferInfoEx(stdoutHandle, &info))
         Error("Failed to set console info");
-}
-
-void SaveConsole()
-{
-    // TODO: Save console buffer and restore it when exiting.
-    s_prevInfo.cbSize = sizeof(CONSOLE_SCREEN_BUFFER_INFOEX);
-    if (!GetConsoleScreenBufferInfoEx(s_stdoutHandle, &s_prevInfo))
-        Error("Failed to get console info");
-
-    if (!GetConsoleMode(s_stdinHandle, &s_prevMode))
-        Error("Couldn't get console mode");
-}
-
-void RestoreConsole()
-{
-    s_prevInfo.srWindow.Right += 1;
-    s_prevInfo.srWindow.Bottom += 1;
-    SetConsoleScreenBufferInfoEx(s_stdoutHandle, &s_prevInfo);
-    SetConsoleMode(s_stdinHandle, s_prevMode);
 }
