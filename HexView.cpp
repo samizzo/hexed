@@ -252,24 +252,39 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
         {
             int selectedLine = GetSelectedLine();
 
-            // Get the current distance from the selection to the top line.
-            int delta = selectedLine - m_topLine;
-
-            // Select the offset at one page down from the current. If we reach the end of the
-            // file then select the same column in the last line, unless it's outside the bounds
-            // of the file in which case clamp to the end.
-            m_selected = min(m_selected + (m_height << 4), ((m_fileSize - 1) & ~0xf) | (m_selected & 0xf));
-            m_selected = min(m_selected, m_fileSize - 1);
-
-            // Determine if we need to update the top line.
-            selectedLine = GetSelectedLine();
-            int bottomLine = GetBottomLine();
-            if (selectedLine > bottomLine)
+            DWORD ctrl = ker.dwControlKeyState;
+            if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
             {
-                // Update the top line, but maintain the current selection distance so the cursor
-                // never moves.
-                m_topLine = max(selectedLine - delta, 0);
-                CacheFile();
+                // Control is down. Go to the bottom of the current page.
+                int bottomLine = GetBottomLine();
+
+                // Select the offset at the bottom of the current page. If we reach the end of the
+                // file then select the same column in the last line, unless it's outside the bounds
+                // of the file in which case clamp to the end.
+                m_selected = min((bottomLine << 4) | (m_selected & 0xf), ((m_fileSize - 1) & ~0xf) | (m_selected & 0xf));
+                m_selected = min(m_selected, m_fileSize - 1);
+            }
+            else
+            {
+                // Get the current distance from the selection to the top line.
+                int delta = selectedLine - m_topLine;
+
+                // Select the offset at one page down from the current. If we reach the end of the
+                // file then select the same column in the last line, unless it's outside the bounds
+                // of the file in which case clamp to the end.
+                m_selected = min(m_selected + (m_height << 4), ((m_fileSize - 1) & ~0xf) | (m_selected & 0xf));
+                m_selected = min(m_selected, m_fileSize - 1);
+
+                // Determine if we need to update the top line.
+                selectedLine = GetSelectedLine();
+                int bottomLine = GetBottomLine();
+                if (selectedLine > bottomLine)
+                {
+                    // Update the top line, but maintain the current selection distance so the cursor
+                    // never moves.
+                    m_topLine = max(selectedLine - delta, 0);
+                    CacheFile();
+                }
             }
 
             Window::Refresh();
