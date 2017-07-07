@@ -113,8 +113,14 @@ void HexView::CacheFile()
 
     delete[] m_buffer;
 
+    assert(m_topLine >= 0);
     int offset = m_topLine << 4;
+    assert(offset >= 0 && offset < m_fileSize);
+    assert(m_height >= 0);
     int screenSize = m_height << 4;
+
+    // Reallocate the buffer.
+    // TODO: Only do this if the window size changes!
     m_bufferSize = offset + screenSize >= m_fileSize ? m_fileSize - offset : screenSize;
     m_buffer = new unsigned char[m_bufferSize];
     memset(m_buffer, 0, m_bufferSize);
@@ -236,6 +242,61 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
             {
                 m_selected = min(m_selected | 15, m_fileSize - 1);
             }
+
+            Window::Refresh();
+            break;
+        }
+
+        // Page down.
+        case VK_NEXT:
+        {
+            int selectedLine = GetSelectedLine();
+
+            // Get the current distance from the selection to the top line.
+            int delta = selectedLine - m_topLine;
+
+            // Select the offset at one page down from the current. If we reach the end of the
+            // file then select the same column in the last line, unless it's outside the bounds
+            // of the file in which case clamp to the end.
+            m_selected = min(m_selected + (m_height << 4), ((m_fileSize - 1) & ~0xf) | (m_selected & 0xf));
+            m_selected = min(m_selected, m_fileSize - 1);
+
+            // Determine if we need to update the top line.
+            selectedLine = GetSelectedLine();
+            int bottomLine = GetBottomLine();
+            if (selectedLine > bottomLine)
+            {
+                // Update the top line, but maintain the current selection distance so the cursor
+                // never moves.
+                m_topLine = max(selectedLine - delta, 0);
+                CacheFile();
+            }
+
+            Window::Refresh();
+            break;
+        }
+
+        // Page up.
+        case VK_PRIOR:
+        {
+            int selectedLine = GetSelectedLine();
+
+            // Get the current distance from the selection to the top line.
+            int delta = selectedLine - m_topLine;
+
+            // Select the offset at one page up from the current.
+            m_selected = max(m_selected - (m_height << 4), (m_selected & 0xf));
+
+            // Determine if we need to update the top line.
+            selectedLine = GetSelectedLine();
+            if (selectedLine < m_topLine)
+            {
+                // Update the top line, but maintain the current selection distance so the cursor
+                // never moves.
+                m_topLine = max(selectedLine - delta, 0);
+                CacheFile();
+            }
+
             Window::Refresh();
             break;
         }
