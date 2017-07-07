@@ -60,12 +60,13 @@ void HexView::OnWindowRefreshed()
         for (int i = 0; i < 16; i++, offset++)
         {
             int bufferIndex = offset - (m_topLine << 4);
-            if (bufferIndex >= m_bufferSize)
+            if (offset >= m_fileSize)
             {
                 done = true;
                 break;
             }
 
+            assert(bufferIndex >= 0 && bufferIndex < m_fileSize);
             unsigned char c = m_buffer[bufferIndex];
 
             if (offset == m_selected)
@@ -103,27 +104,28 @@ void HexView::OnWindowResized(int width, int height)
 {
     height -= 2;
     Window::OnWindowResized(width, height);
-    CacheFile();
+    CacheFile(true);
 }
 
-void HexView::CacheFile()
+void HexView::CacheFile(bool resizeBuffer)
 {
     if (!m_fp)
         return;
 
-    delete[] m_buffer;
-
     assert(m_topLine >= 0);
     int offset = m_topLine << 4;
     assert(offset >= 0 && offset < m_fileSize);
-    assert(m_height >= 0);
-    int screenSize = m_height << 4;
 
-    // Reallocate the buffer.
-    // TODO: Only do this if the window size changes!
-    m_bufferSize = offset + screenSize >= m_fileSize ? m_fileSize - offset : screenSize;
-    m_buffer = new unsigned char[m_bufferSize];
-    memset(m_buffer, 0, m_bufferSize);
+    if (resizeBuffer)
+    {
+        assert(m_height >= 0);
+        int screenSize = m_height << 4;
+
+        delete[] m_buffer;
+        m_bufferSize = offset + screenSize >= m_fileSize ? m_fileSize - offset : screenSize;
+        m_buffer = new unsigned char[m_bufferSize];
+        memset(m_buffer, 0, m_bufferSize);
+    }
 
     fseek(m_fp, offset, SEEK_SET);
     fread_s(m_buffer, m_bufferSize, 1, m_bufferSize, m_fp);

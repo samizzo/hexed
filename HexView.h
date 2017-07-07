@@ -14,7 +14,7 @@ class HexView : public Window
         virtual void OnKeyEvent(const KEY_EVENT_RECORD& ker);
 
     private:
-        void CacheFile();
+        void CacheFile(bool resizeBuffer = false);
 
         int GetSelectedLine();
         int GetLastLine();
