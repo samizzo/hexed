@@ -19,7 +19,7 @@ class Window
         static void Add(Window* window);
         static void Remove(Window* window);
         static void Resize(int width, int height);
-        static void Refresh();
+        static void Refresh(bool fullDraw);
         static void KeyEvent(const KEY_EVENT_RECORD& ker);
 
     protected:
@@ -56,11 +56,11 @@ inline void Window::Resize(int width, int height)
         s_windows[i]->OnWindowResized(width, height);
 }
 
-inline void Window::Refresh()
+inline void Window::Refresh(bool fullDraw)
 {
     for (size_t i = 0; i < s_windows.size(); i++)
         s_windows[i]->OnWindowRefreshed();
-    s_consoleBuffer->Flush();
+    s_consoleBuffer->Flush(fullDraw);
 }
 
 inline void Window::KeyEvent(const KEY_EVENT_RECORD& ker)

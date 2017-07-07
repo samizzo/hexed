@@ -143,6 +143,9 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
     if (!ker.bKeyDown)
         return;
 
+    bool refresh = true;
+    bool fullDraw = false;
+
     switch (ker.wVirtualKeyCode)
     {
         case VK_LEFT:
@@ -153,10 +156,9 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
             {
                 m_topLine--;
                 assert(m_topLine >= 0);
+                fullDraw = true;
                 CacheFile();
             }
-
-            Window::Refresh();
             break;
         }
 
@@ -169,34 +171,35 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
             {
                 m_topLine++;
                 assert((m_topLine << 4) < m_fileSize);
+                fullDraw = true;
                 CacheFile();
             }
-
-            Window::Refresh();
             break;
         }
 
         case VK_UP:
         {
+            refresh = false;
             int selectedLine = GetSelectedLine();
             if (selectedLine == 0)
                 break;
 
+            refresh = true;
             m_selected = max(m_selected - 16, 0);
             selectedLine = GetSelectedLine();
             if (selectedLine < m_topLine)
             {
                 m_topLine--;
                 assert(m_topLine >= 0);
+                fullDraw = true;
                 CacheFile();
             }
-
-            Window::Refresh();
             break;
         }
 
         case VK_DOWN:
         {
+            refresh = false;
             int selectedLine = GetSelectedLine();
             int lastLine = GetLastLine();
 
@@ -204,6 +207,7 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
             if (selectedLine == lastLine)
                 break;
 
+            refresh = true;
             m_selected = min(m_selected + 16, m_fileSize - 1);
             selectedLine = GetSelectedLine();
 
@@ -212,10 +216,9 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
             {
                 m_topLine++;
                 assert((m_topLine << 4) < m_fileSize);
+                fullDraw = true;
                 CacheFile();
             }
-
-            Window::Refresh();
             break;
         }
 
@@ -226,14 +229,13 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
             {
                 m_selected = 0;
                 m_topLine = 0;
+                fullDraw = true;
                 CacheFile();
             }
             else
             {
                 m_selected &= ~15;
             }
-
-            Window::Refresh();
             break;
         }
 
@@ -245,14 +247,13 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
                 m_selected = m_fileSize - 1;
                 int selectedLine = GetSelectedLine();
                 m_topLine = max(selectedLine - m_height + 1, 0);
+                fullDraw = true;
                 CacheFile();
             }
             else
             {
                 m_selected = min(m_selected | 15, m_fileSize - 1);
             }
-
-            Window::Refresh();
             break;
         }
 
@@ -289,11 +290,10 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
                     // Update the top line, but maintain the current selection distance so the cursor
                     // never moves.
                     m_topLine = max(selectedLine - delta, 0);
+                    fullDraw = true;
                     CacheFile();
                 }
             }
-
-            Window::Refresh();
             break;
         }
 
@@ -324,12 +324,20 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
                     // Update the top line, but maintain the current selection distance so the cursor
                     // never moves.
                     m_topLine = max(selectedLine - delta, 0);
+                    fullDraw = true;
                     CacheFile();
                 }
             }
+            break;
+        }
 
-            Window::Refresh();
+        case VK_F5:
+        {
+            fullDraw = true;
             break;
         }
     }
+
+    if (refresh)
+        Window::Refresh(fullDraw);
 }
