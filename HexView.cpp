@@ -250,7 +250,8 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
         // Page down.
         case VK_NEXT:
         {
-            int selectedLine = GetSelectedLine();
+            // Current selection column in the last line.
+            int lastLineSelected = min(((m_fileSize - 1) & ~0xf) | (m_selected & 0xf), m_fileSize - 1);
 
             DWORD ctrl = ker.dwControlKeyState;
             if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
@@ -258,22 +259,18 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
                 // Control is down. Go to the bottom of the current page.
                 int bottomLine = GetBottomLine();
 
-                // Select the offset at the bottom of the current page. If we reach the end of the
-                // file then select the same column in the last line, unless it's outside the bounds
-                // of the file in which case clamp to the end.
-                m_selected = min((bottomLine << 4) | (m_selected & 0xf), ((m_fileSize - 1) & ~0xf) | (m_selected & 0xf));
-                m_selected = min(m_selected, m_fileSize - 1);
+                // Select the offset at the bottom of the current page.
+                m_selected = min((bottomLine << 4) | (m_selected & 0xf), lastLineSelected);
             }
             else
             {
+                int selectedLine = GetSelectedLine();
+
                 // Get the current distance from the selection to the top line.
                 int delta = selectedLine - m_topLine;
 
-                // Select the offset at one page down from the current. If we reach the end of the
-                // file then select the same column in the last line, unless it's outside the bounds
-                // of the file in which case clamp to the end.
-                m_selected = min(m_selected + (m_height << 4), ((m_fileSize - 1) & ~0xf) | (m_selected & 0xf));
-                m_selected = min(m_selected, m_fileSize - 1);
+                // Select the offset at one page down from the current.
+                m_selected = min(m_selected + (m_height << 4), lastLineSelected);
 
                 // Determine if we need to update the top line.
                 selectedLine = GetSelectedLine();
@@ -294,22 +291,32 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
         // Page up.
         case VK_PRIOR:
         {
-            int selectedLine = GetSelectedLine();
-
-            // Get the current distance from the selection to the top line.
-            int delta = selectedLine - m_topLine;
-
-            // Select the offset at one page up from the current.
-            m_selected = max(m_selected - (m_height << 4), (m_selected & 0xf));
-
-            // Determine if we need to update the top line.
-            selectedLine = GetSelectedLine();
-            if (selectedLine < m_topLine)
+            DWORD ctrl = ker.dwControlKeyState;
+            if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
             {
-                // Update the top line, but maintain the current selection distance so the cursor
-                // never moves.
-                m_topLine = max(selectedLine - delta, 0);
-                CacheFile();
+                // Control is down. Go to the top of the current page.
+                // Select the offset at the top of the current page.
+                m_selected = (m_topLine << 4) | m_selected & 0xf;
+            }
+            else
+            {
+                int selectedLine = GetSelectedLine();
+
+                // Get the current distance from the selection to the top line.
+                int delta = selectedLine - m_topLine;
+
+                // Select the offset at one page up from the current.
+                m_selected = max(m_selected - (m_height << 4), (m_selected & 0xf));
+
+                // Determine if we need to update the top line.
+                selectedLine = GetSelectedLine();
+                if (selectedLine < m_topLine)
+                {
+                    // Update the top line, but maintain the current selection distance so the cursor
+                    // never moves.
+                    m_topLine = max(selectedLine - delta, 0);
+                    CacheFile();
+                }
             }
 
             Window::Refresh();
