@@ -50,6 +50,20 @@ int main(int argc, char** argv)
 
     while (s_running)
     {
+        CONSOLE_SCREEN_BUFFER_INFO info;
+        if (GetConsoleScreenBufferInfo(stdoutHandle, &info))
+        {
+            int newWidth = info.srWindow.Right - info.srWindow.Left + 1;
+            int newHeight = info.srWindow.Bottom - info.srWindow.Top + 1;
+            if (newWidth != width || newHeight != height)
+            {
+                width = newWidth;
+                height = newHeight;
+                Window::Resize(width, height);
+                Window::Refresh(true);
+            }
+        }
+
         DWORD numEventsAvailable;
         GetNumberOfConsoleInputEvents(stdinHandle, &numEventsAvailable);
         if (numEventsAvailable > 0)
@@ -61,20 +75,6 @@ int main(int argc, char** argv)
             {
                 INPUT_RECORD& e = inputBuffer[i];
                 ProcessInput(e);
-            }
-        }
-
-        CONSOLE_SCREEN_BUFFER_INFO info;
-        if (GetConsoleScreenBufferInfo(stdoutHandle, &info))
-        {
-            int newWidth = info.srWindow.Right - info.srWindow.Left + 1;
-            int newHeight = info.srWindow.Bottom - info.srWindow.Top + 1;
-            if (newWidth != width || newHeight != height)
-            {
-                width = newWidth;
-                height = newHeight;
-                Window::Resize(width, height);
-                Window::Refresh();
             }
         }
     }
