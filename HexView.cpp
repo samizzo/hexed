@@ -38,23 +38,30 @@ void HexView::OnWindowRefreshed()
     int selectedLine = GetSelectedLine();
     bool done = false;
 
-    for (int j = 0; j < m_height && !done; j++)
+    for (int j = 0; j < m_height; j++)
     {
         int y = 1 + j;
-        int x = 1;
+        int x = 2;
         WORD colour = 0;
+
+        int curr = (m_selected >> 4) * (m_height - 1) / (m_fileSize >> 4);
+        char c = j == curr ? 178 : 176;
+        s_consoleBuffer->Write(0, y, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY, "%c", c);
+
+        if (done)
+            continue;
 
         if ((offset >> 4) == selectedLine)
         {
             // Highlight the selected line's offset text.
-            colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY | COMMON_LVB_REVERSE_VIDEO;
+            colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
         }
         else
         {
             colour = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
         }
 
-        s_consoleBuffer->Write(1, y, colour, "%08X", offset);
+        s_consoleBuffer->Write(x, y, colour, "%08X", offset);
         x += 9;
 
         for (int i = 0; i < 16; i++, offset++)
