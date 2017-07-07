@@ -35,17 +35,18 @@ void HexView::OnWindowRefreshed()
 
     assert(m_buffer);
     int offset = m_offset;
+    int selectedLine = GetSelectedLine();
+    bool done = false;
 
-    for (int j = 0; j < m_height; j++)
+    for (int j = 0; j < m_height && !done; j++)
     {
-        if (offset >= m_bufferSize)
-            break;
-
         int y = 1 + j;
         int x = 1;
         WORD colour = 0;
-        if ((offset & ~15) == (m_selected & ~15))
+
+        if ((offset >> 4) == selectedLine)
         {
+            // Highlight the selected line's offset text.
             colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY | COMMON_LVB_REVERSE_VIDEO;
         }
         else
@@ -58,13 +59,18 @@ void HexView::OnWindowRefreshed()
 
         for (int i = 0; i < 16; i++, offset++)
         {
-            if (offset >= m_bufferSize)
+            int bufferIndex = offset - m_offset;
+            if (bufferIndex >= m_bufferSize)
+            {
+                done = true;
                 break;
+            }
 
-            unsigned char c = m_buffer[offset];
+            unsigned char c = m_buffer[bufferIndex];
 
             if (offset == m_selected)
             {
+                // Highlight the selected byte.
                 colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
             }
             else
@@ -81,6 +87,7 @@ void HexView::OnWindowRefreshed()
 
             if (offset == m_selected)
             {
+                // Highlight the selected character.
                 colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
             }
             else
@@ -106,7 +113,7 @@ void HexView::CacheFile()
 
     delete[] m_buffer;
 
-    m_bufferSize = m_offset + (m_height * 16) > m_fileSize ? m_fileSize - m_offset : m_height * 16;
+    m_bufferSize = m_offset + (m_height << 4) >= m_fileSize ? m_fileSize - m_offset : m_height << 4;
     m_buffer = new unsigned char[m_bufferSize];
     memset(m_buffer, 0, m_bufferSize);
 
@@ -124,6 +131,15 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
         case VK_LEFT:
         {
             m_selected = max(m_selected - 1, 0);
+            int selectedLine = GetSelectedLine();
+            int topLine = GetTopLine();
+            if (selectedLine < topLine)
+            {
+                m_offset -= 16;
+                assert(m_offset >= 0);
+                CacheFile();
+            }
+
             Window::Refresh();
             break;
         }
@@ -131,27 +147,60 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
         case VK_RIGHT:
         {
             m_selected = min(m_selected + 1, m_fileSize - 1);
+            int selectedLine = GetSelectedLine();
+            int bottomLine = GetBottomLine();
+            if (selectedLine > bottomLine)
+            {
+                m_offset += 16;
+                assert(m_offset < m_fileSize);
+                CacheFile();
+            }
+
             Window::Refresh();
             break;
         }
 
         case VK_UP:
         {
-            if ((m_selected & ~15) != 0)
+            int selectedLine = GetSelectedLine();
+            if (selectedLine == 0)
+                break;
+
+            m_selected = max(m_selected - 16, 0);
+            selectedLine = GetSelectedLine();
+            int topLine = GetTopLine();
+            if (selectedLine < topLine)
             {
-                m_selected = max(m_selected - 16, 0);
-                Window::Refresh();
+                m_offset -= 16;
+                assert(m_offset >= 0);
+                CacheFile();
             }
+
+            Window::Refresh();
             break;
         }
 
         case VK_DOWN:
         {
-            if ((m_selected & ~15) != (m_fileSize & ~15))
+            int selectedLine = GetSelectedLine();
+            int lastLine = GetLastLine();
+
+            // If on the last line, don't move anywhere.
+            if (selectedLine == lastLine)
+                break;
+
+            m_selected = min(m_selected + 16, m_fileSize - 1);
+            selectedLine = GetSelectedLine();
+
+            int bottomLine = GetTopLine() + m_height - 1;
+            if (selectedLine > bottomLine)
             {
-                m_selected = min(m_selected + 16, m_fileSize - 1);
-                Window::Refresh();
+                m_offset += 16;
+                assert(m_offset < m_fileSize);
+                CacheFile();
             }
+
+            Window::Refresh();
             break;
         }
 
@@ -161,11 +210,14 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
             if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
             {
                 m_selected = 0;
+                m_offset = 0;
+                CacheFile();
             }
             else
             {
                 m_selected &= ~15;
             }
+
             Window::Refresh();
             break;
         }
@@ -176,6 +228,9 @@ void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
             if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
             {
                 m_selected = m_fileSize - 1;
+                int selectedLine = GetSelectedLine();
+                m_offset = max((selectedLine - m_height + 1) << 4, 0);
+                CacheFile();
             }
             else
             {

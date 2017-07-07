@@ -16,6 +16,11 @@ class HexView : public Window
     private:
         void CacheFile();
 
+        int GetSelectedLine();
+        int GetLastLine();
+        int GetTopLine();
+        int GetBottomLine();
+
         FILE* m_fp;
         unsigned char* m_buffer;
         int m_bufferSize;
@@ -23,3 +28,23 @@ class HexView : public Window
         int m_selected;
         int m_fileSize;
 };
+
+inline int HexView::GetSelectedLine()
+{
+    return m_selected >> 4;
+}
+
+inline int HexView::GetLastLine()
+{
+    return m_fileSize >> 4;
+}
+
+inline int HexView::GetTopLine()
+{
+    return m_offset >> 4;
+}
+
+inline int HexView::GetBottomLine()
+{
+    return GetTopLine() + m_height - 1;
+}
