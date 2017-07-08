@@ -9,6 +9,7 @@ HexView::HexView(const char* filename, Window* parent) : Window(parent)
     m_buffer = 0;
     m_topLine = 0;
     m_selected = 0;
+    m_fileSize = 0;
     fopen_s(&m_fp, filename, "rb");
     if (m_fp)
     {
@@ -30,7 +31,7 @@ void HexView::OnWindowRefreshed()
 
     s_consoleBuffer->FillRect(0, 1, m_width, m_height, ' ', FOREGROUND_RED);
     s_consoleBuffer->FillLine(m_height + 1, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
-    s_consoleBuffer->Write(2, m_height + 1, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08X / %08X", m_selected, m_fileSize - 1);
+    s_consoleBuffer->Write(2, m_height + 1, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08X / %08X", m_selected, max(m_fileSize - 1, 0));
 
     if (!m_fp)
         return;
@@ -169,7 +170,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 
         case VK_RIGHT:
         {
-            m_selected = min(m_selected + 1, m_fileSize - 1);
+            m_selected = max(min(m_selected + 1, m_fileSize - 1), 0);
             int selectedLine = GetSelectedLine();
             int bottomLine = GetBottomLine();
             if (selectedLine > bottomLine)
@@ -213,7 +214,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
                 break;
 
             refresh = true;
-            m_selected = min(m_selected + 16, m_fileSize - 1);
+            m_selected = max(min(m_selected + 16, m_fileSize - 1), 0);
             selectedLine = GetSelectedLine();
 
             int bottomLine = GetBottomLine();
@@ -247,7 +248,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
         {
             if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
             {
-                m_selected = m_fileSize - 1;
+                m_selected = max(m_fileSize - 1, 0);
                 int selectedLine = GetSelectedLine();
                 m_topLine = max(selectedLine - m_height + 1, 0);
                 fullDraw = true;
@@ -255,7 +256,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
             }
             else
             {
-                m_selected = min(m_selected | 15, m_fileSize - 1);
+                m_selected = max(min(m_selected | 15, m_fileSize - 1), 0);
             }
             break;
         }
@@ -264,7 +265,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
         case VK_NEXT:
         {
             // Current selection column in the last line.
-            int lastLineSelected = min(((m_fileSize - 1) & ~0xf) | (m_selected & 0xf), m_fileSize - 1);
+            int lastLineSelected = max(min(((m_fileSize - 1) & ~0xf) | (m_selected & 0xf), m_fileSize - 1), 0);
 
             if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
             {
