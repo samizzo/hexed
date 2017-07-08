@@ -36,7 +36,7 @@ void HexView::OnWindowRefreshed()
         int x = 2;
         WORD colour = 0;
 
-        int curr = (m_selected >> 4) * (m_height - 1) / (m_fileSize >> 4);
+        int curr = (m_selected >> 4) * (m_height - 1) / ((m_fileSize - 1) >> 4);
         char c = j == curr ? 178 : 176;
         s_consoleBuffer->Write(0, y, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY, "%c", c);
 
