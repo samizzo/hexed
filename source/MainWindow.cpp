@@ -17,7 +17,7 @@ void MainWindow::OnWindowRefreshed()
 
     int selectedOffset = m_hexView.GetSelectedOffset();
     int fileSize = max(m_hexView.GetFileSize() - 1, 0);
-    s_consoleBuffer->Write(2, m_height - 1, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08X / %08X", selectedOffset, fileSize);
+    s_consoleBuffer->Write(m_width - 21, 0, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08X / %08X", selectedOffset, fileSize);
 
     Window::OnWindowRefreshed();
 }
