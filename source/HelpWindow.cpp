@@ -23,6 +23,7 @@ void HelpWindow::OnWindowResized(int width, int height)
 
 void HelpWindow::OnKeyEvent(KeyEvent& keyEvent)
 {
+    keyEvent.SetHandled();
     if (!keyEvent.IsKeyDown() && keyEvent.GetVKKeyCode() == VK_ESCAPE)
         SetVisible(false);
 }

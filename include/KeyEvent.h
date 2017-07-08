@@ -9,7 +9,11 @@ class KeyEvent
         unsigned short GetVKKeyCode() const;
         bool IsControlKeyDown(int controlKey) const;
 
+        bool WasHandled() const;
+        void SetHandled();
+
     private:
+        bool m_handled;
         bool m_keyDown;
         unsigned short m_vkKeyCode;
         unsigned long m_controlKeyState;
@@ -17,6 +21,7 @@ class KeyEvent
 
 inline KeyEvent::KeyEvent(bool keyDown, unsigned short vkKeyCode, unsigned long controlKeyState)
 {
+    m_handled = false;
     m_keyDown = keyDown;
     m_vkKeyCode = vkKeyCode;
     m_controlKeyState = controlKeyState;
@@ -35,4 +40,14 @@ inline unsigned short KeyEvent::GetVKKeyCode() const
 inline bool KeyEvent::IsControlKeyDown(int controlKey) const
 {
     return (m_controlKeyState & controlKey) != 0;
+}
+
+inline bool KeyEvent::WasHandled() const
+{
+    return m_handled;
+}
+
+inline void KeyEvent::SetHandled()
+{
+    m_handled = true;
 }

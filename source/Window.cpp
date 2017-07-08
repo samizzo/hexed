@@ -55,6 +55,10 @@ void Window::ProcessKeyInput(KeyEvent& keyEvent)
     {
         Window* window = s_focusWindows[i];
         window->OnKeyEvent(keyEvent);
+
+        // If a window handled the event, no other windows will handled it.
+        if (keyEvent.WasHandled())
+            break;
     }
 }
 
@@ -69,6 +73,8 @@ void Window::SetVisible(bool visible)
     m_flags = visible ? m_flags | Flags_Visible : m_flags & ~Flags_Visible;
     if (IsVisible())
         OnWindowResized(s_consoleBuffer->GetWidth(), s_consoleBuffer->GetHeight());
+
+    SetFocus(IsVisible());
     Window::Refresh(true);
 }
 
