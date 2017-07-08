@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Window.h"
-#include <stdio.h>
+#include "File.h"
 
 class HexView : public Window
 {
@@ -23,7 +23,7 @@ class HexView : public Window
         int GetLastLine();
         int GetBottomLine();
 
-        FILE* m_fp;
+        File m_file;
         unsigned char* m_buffer;
         int m_bufferSize;
         int m_topLine;

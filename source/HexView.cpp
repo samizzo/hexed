@@ -1,35 +1,28 @@
 #include "HexView.h"
 #include "Log.h"
-#include <stdio.h>
 #include <assert.h>
 
 HexView::HexView(const char* filename, Window* parent) : Window(parent)
 {
-    m_fp = 0;
     m_buffer = 0;
     m_topLine = 0;
     m_selected = 0;
     m_fileSize = 0;
-    fopen_s(&m_fp, filename, "rb");
-    if (m_fp)
-    {
-        fseek(m_fp, 0, SEEK_END);
-        m_fileSize = ftell(m_fp);
-        fseek(m_fp, 0, SEEK_SET);
-    }
+    m_file.Open(filename);
+    if (m_file.IsOpen())
+        m_fileSize = m_file.GetSize();
 }
 
 HexView::~HexView()
 {
-    if (m_fp)
-        fclose(m_fp);
+    m_file.Close();
 }
 
 void HexView::OnWindowRefreshed()
 {
     Window::OnWindowRefreshed();
 
-    if (!m_fp)
+    if (!m_file.IsOpen())
         return;
 
     assert(m_buffer);
@@ -116,7 +109,7 @@ void HexView::OnWindowResized(int width, int height)
 
 void HexView::CacheFile(bool resizeBuffer)
 {
-    if (!m_fp)
+    if (!m_file.IsOpen())
         return;
 
     assert(m_topLine >= 0);
@@ -134,8 +127,8 @@ void HexView::CacheFile(bool resizeBuffer)
         memset(m_buffer, 0, m_bufferSize);
     }
 
-    fseek(m_fp, offset, SEEK_SET);
-    fread_s(m_buffer, m_bufferSize, 1, m_bufferSize, m_fp);
+    m_file.Seek(offset);
+    m_file.Read(m_buffer, m_bufferSize);
 }
 
 void HexView::OnKeyEvent(KeyEvent& keyEvent)

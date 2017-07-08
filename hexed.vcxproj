@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="source\ConsoleBuffer.cpp" />
     <ClCompile Include="source\Error.cpp" />
+    <ClCompile Include="Source\File.cpp" />
     <ClCompile Include="source\HexView.cpp" />
     <ClCompile Include="source\Log.cpp" />
     <ClCompile Include="source\main.cpp" />
@@ -32,6 +33,7 @@
   <ItemGroup>
     <ClInclude Include="include\ConsoleBuffer.h" />
     <ClInclude Include="include\Error.h" />
+    <ClInclude Include="include\File.h" />
     <ClInclude Include="include\HexView.h" />
     <ClInclude Include="include\KeyEvent.h" />
     <ClInclude Include="include\Log.h" />
