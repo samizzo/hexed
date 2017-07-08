@@ -11,7 +11,7 @@ class HexView : public Window
 
         virtual void OnWindowRefreshed();
         virtual void OnWindowResized(int newWidth, int newHeight);
-        virtual void OnKeyEvent(const KEY_EVENT_RECORD& ker);
+        virtual void OnKeyEvent(KeyEvent& keyEvent);
 
     private:
         void CacheFile(bool resizeBuffer = false);

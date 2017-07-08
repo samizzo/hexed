@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Windows.h>
 #include "ConsoleBuffer.h"
+#include "KeyEvent.h"
 #include <vector>
 #include <algorithm>
 #include <assert.h>
@@ -14,7 +14,7 @@ class Window
 
         virtual void OnWindowRefreshed();
 		virtual void OnWindowResized(int width, int height);
-        virtual void OnKeyEvent(const KEY_EVENT_RECORD& ker);
+        virtual void OnKeyEvent(KeyEvent& keyEvent);
 
         void AddChild(Window* window);
 
@@ -22,7 +22,7 @@ class Window
         static void Add(Window* window);
         static void Resize(int width, int height);
         static void Refresh(bool fullDraw);
-        static void KeyEvent(const KEY_EVENT_RECORD& ker);
+        static void ProcessKeyInput(KeyEvent& keyEvent);
 
     protected:
         int m_width;
@@ -75,16 +75,16 @@ inline void Window::Refresh(bool fullDraw)
     s_consoleBuffer->Flush(fullDraw);
 }
 
-inline void Window::KeyEvent(const KEY_EVENT_RECORD& ker)
+inline void Window::ProcessKeyInput(KeyEvent& keyEvent)
 {
     for (size_t i = 0; i < s_rootWindows.size(); i++)
-        s_rootWindows[i]->OnKeyEvent(ker);
+        s_rootWindows[i]->OnKeyEvent(keyEvent);
 }
 
-inline void Window::OnKeyEvent(const KEY_EVENT_RECORD& ker)
+inline void Window::OnKeyEvent(KeyEvent& keyEvent)
 {
     for (size_t i = 0; i < m_children.size(); i++)
-        m_children[i]->OnKeyEvent(ker);
+        m_children[i]->OnKeyEvent(keyEvent);
 }
 
 inline void Window::OnWindowRefreshed()

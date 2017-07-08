@@ -91,7 +91,8 @@ void ProcessInput(const INPUT_RECORD& inputRecord)
             const KEY_EVENT_RECORD& ker = inputRecord.Event.KeyEvent;
             if (ker.wVirtualKeyCode == VK_ESCAPE && !ker.bKeyDown)
                 s_running = false;
-            Window::KeyEvent(ker);
+            KeyEvent keyEvent(ker);
+            Window::ProcessKeyInput(keyEvent);
             break;
         }
     }

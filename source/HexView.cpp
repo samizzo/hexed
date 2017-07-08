@@ -141,9 +141,11 @@ void HexView::CacheFile(bool resizeBuffer)
     fread_s(m_buffer, m_bufferSize, 1, m_bufferSize, m_fp);
 }
 
-void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
+void HexView::OnKeyEvent(KeyEvent& keyEvent)
 {
-    Window::OnKeyEvent(ker);
+    Window::OnKeyEvent(keyEvent);
+
+    const KEY_EVENT_RECORD& ker = keyEvent.GetEvent();
 
     if (!ker.bKeyDown)
         return;

@@ -33,6 +33,7 @@
     <ClInclude Include="include\ConsoleBuffer.h" />
     <ClInclude Include="include\Error.h" />
     <ClInclude Include="include\HexView.h" />
+    <ClInclude Include="include\KeyEvent.h" />
     <ClInclude Include="include\Log.h" />
     <ClInclude Include="include\MainWindow.h" />
     <ClInclude Include="include\Path.h" />
