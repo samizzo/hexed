@@ -83,6 +83,7 @@ void ConsoleBuffer::Clear()
 
 void ConsoleBuffer::OnWindowResize(int width, int height)
 {
+    // TODO: Resize the window to the specified size.
     delete[] m_buffer;
     m_width = width;
     m_height = height;
