@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "MainWindow.h"
 #include "HexView.h"
 #include <stdio.h>
 #include <string>
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
     ConsoleBuffer buffer(stdoutHandle);
     Window::SetConsoleBuffer(&buffer);
-    Window window(argv[1]);
+    MainWindow mainWindow(argv[1]);
     HexView hexView(argv[1]);
 
     s_running = true;

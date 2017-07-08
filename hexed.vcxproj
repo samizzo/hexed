@@ -24,6 +24,7 @@
     <ClCompile Include="source\HexView.cpp" />
     <ClCompile Include="source\Log.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\MainWindow.cpp" />
     <ClCompile Include="source\Path.cpp" />
     <ClCompile Include="source\SaveRestoreConsole.cpp" />
     <ClCompile Include="source\Window.cpp" />
@@ -33,10 +34,10 @@
     <ClInclude Include="include\Error.h" />
     <ClInclude Include="include\HexView.h" />
     <ClInclude Include="include\Log.h" />
+    <ClInclude Include="include\MainWindow.h" />
     <ClInclude Include="include\Path.h" />
     <ClInclude Include="include\SaveRestoreConsole.h" />
     <ClInclude Include="include\Window.h" />
-    <ClInclude Include="source\Error.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7AB912DC-5910-4D78-9A99-252A60207B94}</ProjectGuid>

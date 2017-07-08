@@ -4,12 +4,13 @@
 #include "ConsoleBuffer.h"
 #include <vector>
 #include <algorithm>
+#include <assert.h>
 
 class Window
 {
     public:
-		Window(const char* filename);
-        ~Window();
+		Window();
+        virtual ~Window();
 
         virtual void OnWindowRefreshed();
 		virtual void OnWindowResized(int width, int height);
@@ -23,7 +24,6 @@ class Window
         static void KeyEvent(const KEY_EVENT_RECORD& ker);
 
     protected:
-        const char* m_filename;
         int m_width;
         int m_height;
 
@@ -60,6 +60,7 @@ inline void Window::Refresh(bool fullDraw)
 {
     for (size_t i = 0; i < s_windows.size(); i++)
         s_windows[i]->OnWindowRefreshed();
+    assert(s_consoleBuffer);
     s_consoleBuffer->Flush(fullDraw);
 }
 
@@ -70,5 +71,9 @@ inline void Window::KeyEvent(const KEY_EVENT_RECORD& ker)
 }
 
 inline void Window::OnKeyEvent(const KEY_EVENT_RECORD& ker)
+{
+}
+
+inline void Window::OnWindowRefreshed()
 {
 }

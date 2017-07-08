@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-HexView::HexView(const char* filename) : Window(filename)
+HexView::HexView(const char* filename) : Window()
 {
     m_fp = 0;
     m_buffer = 0;
