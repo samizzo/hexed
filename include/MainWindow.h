@@ -10,6 +10,7 @@ class MainWindow : public Window
         virtual void OnWindowRefreshed();
 
     private:
-        const char* m_filename;
+        char m_fullPath[MAX_PATH];
+        char* m_filename;
         HexView m_hexView;
 };
