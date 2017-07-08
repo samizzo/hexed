@@ -10,15 +10,16 @@ class Window
 {
     public:
 		Window();
-        virtual ~Window();
+        Window(Window* parent);
 
         virtual void OnWindowRefreshed();
 		virtual void OnWindowResized(int width, int height);
         virtual void OnKeyEvent(const KEY_EVENT_RECORD& ker);
 
+        void AddChild(Window* window);
+
         static void SetConsoleBuffer(ConsoleBuffer* buffer);
         static void Add(Window* window);
-        static void Remove(Window* window);
         static void Resize(int width, int height);
         static void Refresh(bool fullDraw);
         static void KeyEvent(const KEY_EVENT_RECORD& ker);
@@ -30,8 +31,24 @@ class Window
         static ConsoleBuffer* s_consoleBuffer;
 
     private:
-        static std::vector<Window*> s_windows;
+        std::vector<Window*> m_children;
+
+        static std::vector<Window*> s_rootWindows;
 };
+
+inline Window::Window()
+{
+    m_width = 0;
+    m_height = 0;
+    Add(this);
+}
+
+inline Window::Window(Window* parent)
+{
+    m_width = 0;
+    m_height = 0;
+    parent->AddChild(this);
+}
 
 inline void Window::SetConsoleBuffer(ConsoleBuffer* buffer)
 {
@@ -40,40 +57,51 @@ inline void Window::SetConsoleBuffer(ConsoleBuffer* buffer)
 
 inline void Window::Add(Window* window)
 {
-    s_windows.push_back(window);
-}
-
-inline void Window::Remove(Window* window)
-{
-    auto iter = std::remove(s_windows.begin(), s_windows.end(), window);
-    s_windows.erase(iter);
+    s_rootWindows.push_back(window);
 }
 
 inline void Window::Resize(int width, int height)
 {
     s_consoleBuffer->OnWindowResize(width, height);
-    for (size_t i = 0; i < s_windows.size(); i++)
-        s_windows[i]->OnWindowResized(width, height);
+    for (size_t i = 0; i < s_rootWindows.size(); i++)
+        s_rootWindows[i]->OnWindowResized(width, height);
 }
 
 inline void Window::Refresh(bool fullDraw)
 {
-    for (size_t i = 0; i < s_windows.size(); i++)
-        s_windows[i]->OnWindowRefreshed();
+    for (size_t i = 0; i < s_rootWindows.size(); i++)
+        s_rootWindows[i]->OnWindowRefreshed();
     assert(s_consoleBuffer);
     s_consoleBuffer->Flush(fullDraw);
 }
 
 inline void Window::KeyEvent(const KEY_EVENT_RECORD& ker)
 {
-    for (size_t i = 0; i < s_windows.size(); i++)
-        s_windows[i]->OnKeyEvent(ker);
+    for (size_t i = 0; i < s_rootWindows.size(); i++)
+        s_rootWindows[i]->OnKeyEvent(ker);
 }
 
 inline void Window::OnKeyEvent(const KEY_EVENT_RECORD& ker)
 {
+    for (size_t i = 0; i < m_children.size(); i++)
+        m_children[i]->OnKeyEvent(ker);
 }
 
 inline void Window::OnWindowRefreshed()
 {
+    for (size_t i = 0; i < m_children.size(); i++)
+        m_children[i]->OnWindowRefreshed();
+}
+
+inline void Window::OnWindowResized(int width, int height)
+{
+    m_width = width;
+    m_height = height;
+    for (size_t i = 0; i < m_children.size(); i++)
+        m_children[i]->OnWindowResized(width, height);
+}
+
+inline void Window::AddChild(Window* window)
+{
+    m_children.push_back(window);
 }

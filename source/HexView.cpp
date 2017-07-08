@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-HexView::HexView(const char* filename) : Window()
+HexView::HexView(const char* filename, Window* parent) : Window(parent)
 {
     m_fp = 0;
     m_buffer = 0;
@@ -26,6 +26,8 @@ HexView::~HexView()
 
 void HexView::OnWindowRefreshed()
 {
+    Window::OnWindowRefreshed();
+
     s_consoleBuffer->FillRect(0, 1, m_width, m_height, ' ', FOREGROUND_RED);
     s_consoleBuffer->FillLine(m_height + 1, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
     s_consoleBuffer->Write(2, m_height + 1, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08X / %08X", m_selected, m_fileSize - 1);
@@ -109,6 +111,7 @@ void HexView::OnWindowRefreshed()
 
 void HexView::OnWindowResized(int width, int height)
 {
+    // Our height is actually smaller.
     height -= 2;
     Window::OnWindowResized(width, height);
     CacheFile(true);
@@ -140,6 +143,8 @@ void HexView::CacheFile(bool resizeBuffer)
 
 void HexView::OnKeyEvent(const KEY_EVENT_RECORD& ker)
 {
+    Window::OnKeyEvent(ker);
+
     if (!ker.bKeyDown)
         return;
 
