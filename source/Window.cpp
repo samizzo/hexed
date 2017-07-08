@@ -1,6 +1,7 @@
 #include "Window.h"
 
 std::vector<Window*> Window::s_rootWindows;
+std::vector<Window*> Window::s_focusWindows;
 ConsoleBuffer* Window::s_consoleBuffer;
 
 Window::Window()
@@ -49,11 +50,11 @@ void Window::Refresh(bool fullDraw)
 
 void Window::ProcessKeyInput(KeyEvent& keyEvent)
 {
-    for (size_t i = 0; i < s_rootWindows.size(); i++)
+    // Input is processed in order of focussed window.
+    for (int i = (int)s_focusWindows.size() - 1; i >= 0; i--)
     {
-        Window* window = s_rootWindows[i];
-        if (window->IsVisible() && window->HasFocus())
-            window->OnKeyEvent(keyEvent);
+        Window* window = s_focusWindows[i];
+        window->OnKeyEvent(keyEvent);
     }
 }
 
@@ -78,10 +79,19 @@ bool Window::IsVisible() const
 
 void Window::SetFocus(bool focus)
 {
-    m_flags = focus ? m_flags | Flags_Focus : m_flags & ~Flags_Focus;
-}
-
-bool Window::HasFocus() const
-{
-    return (m_flags & Flags_Focus) != 0;
+    if (focus)
+    {
+        s_focusWindows.push_back(this);
+    }
+    else
+    {
+        for (size_t i = 0; i < s_focusWindows.size(); i++)
+        {
+            if (s_focusWindows[i] == this)
+            {
+                s_focusWindows.erase(s_focusWindows.begin() + i);
+                break;
+            }
+        }
+    }
 }

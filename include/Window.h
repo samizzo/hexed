@@ -10,14 +10,13 @@ class Window
     public:
 		Window();
 
-        virtual void OnWindowRefreshed() { };
+        virtual void OnWindowRefreshed() = 0;
 		virtual void OnWindowResized(int width, int height);
         virtual void OnKeyEvent(KeyEvent& keyEvent) { };
 
         void SetVisible(bool visible);
         bool IsVisible() const;
         void SetFocus(bool focus);
-        bool HasFocus() const;
 
         static void SetConsoleBuffer(ConsoleBuffer* buffer);
         static void Add(Window* window);
@@ -34,11 +33,11 @@ class Window
     private:
         enum Flags
         {
-           Flags_Focus = 1 << 0,
-           Flags_Visible = 1 << 1
+           Flags_Visible = 1 << 0
         };
 
         unsigned int m_flags;
 
         static std::vector<Window*> s_rootWindows;
+        static std::vector<Window*> s_focusWindows;
 };

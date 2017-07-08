@@ -20,8 +20,6 @@ HexView::~HexView()
 
 void HexView::OnWindowRefreshed()
 {
-    Window::OnWindowRefreshed();
-
     if (!m_file.IsOpen())
         return;
 

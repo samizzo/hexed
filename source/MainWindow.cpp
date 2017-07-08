@@ -7,6 +7,8 @@ static const int MAX_FILENAME_SIZE = 32;
 MainWindow::MainWindow(const char* filename) :
 m_hexView(filename)
 {
+    SetFocus(true);
+    m_hexView.SetFocus(true);
     m_helpWindow.SetVisible(false);
 
     GetFullPathName(filename, MAX_PATH, m_fullPath, &m_filename);
@@ -42,8 +44,6 @@ void MainWindow::OnWindowRefreshed()
 
     s_consoleBuffer->Write(0, m_height - 1, BACKGROUND_GREEN | BACKGROUND_RED,  " F1 Help    ");
     //s_consoleBuffer->Write(14, m_height - 1, BACKGROUND_GREEN | BACKGROUND_RED, " F2 Colours ");
-
-    Window::OnWindowRefreshed();
 }
 
 void MainWindow::OnKeyEvent(KeyEvent& keyEvent)
