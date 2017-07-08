@@ -12,7 +12,7 @@ class Window
 
         virtual void OnWindowRefreshed() = 0;
 		virtual void OnWindowResized(int width, int height);
-        virtual void OnKeyEvent(KeyEvent& keyEvent) { };
+        virtual void OnKeyEvent(KeyEvent& keyEvent) = 0;
 
         void SetVisible(bool visible);
         bool IsVisible() const;
