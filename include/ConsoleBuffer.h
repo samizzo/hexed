@@ -16,6 +16,9 @@ class ConsoleBuffer
         void OnWindowResize(int width, int height);
         void Flush(bool fullDraw);
 
+        int GetWidth() const;
+        int GetHeight() const;
+
     private:
         int m_width;
         int m_height;
@@ -27,4 +30,14 @@ class ConsoleBuffer
 inline bool ConsoleBuffer::IsInitialised() const
 {
     return m_buffer != 0;
+}
+
+inline int ConsoleBuffer::GetWidth() const
+{
+    return m_width;
+}
+
+inline int ConsoleBuffer::GetHeight() const
+{
+    return m_height;
 }

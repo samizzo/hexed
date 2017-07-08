@@ -6,7 +6,7 @@
 class HexView : public Window
 {
     public:
-        HexView(const char* filename, Window* parent);
+        HexView(const char* filename);
         ~HexView();
 
         virtual void OnWindowRefreshed();

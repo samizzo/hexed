@@ -9,13 +9,10 @@ class Window
 {
     public:
 		Window();
-        Window(Window* parent);
 
-        virtual void OnWindowRefreshed();
+        virtual void OnWindowRefreshed() { };
 		virtual void OnWindowResized(int width, int height);
-        virtual void OnKeyEvent(KeyEvent& keyEvent);
-
-        void AddChild(Window* window);
+        virtual void OnKeyEvent(KeyEvent& keyEvent) { };
 
         void SetVisible(bool visible);
         bool IsVisible() const;
@@ -31,7 +28,6 @@ class Window
     protected:
         int m_width;
         int m_height;
-        Window* m_parent;
 
         static ConsoleBuffer* s_consoleBuffer;
 
@@ -42,7 +38,6 @@ class Window
            Flags_Visible = 1 << 1
         };
 
-        std::vector<Window*> m_children;
         unsigned int m_flags;
 
         static std::vector<Window*> s_rootWindows;

@@ -5,8 +5,7 @@
 static const int MAX_FILENAME_SIZE = 32;
 
 MainWindow::MainWindow(const char* filename) :
-m_hexView(filename, this),
-m_helpWindow(this)
+m_hexView(filename)
 {
     m_helpWindow.SetVisible(false);
 

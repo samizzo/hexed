@@ -1,10 +1,5 @@
 #include "HelpWindow.h"
 
-HelpWindow::HelpWindow(Window* parent) :
-Window(parent)
-{
-}
-
 void HelpWindow::OnWindowRefreshed()
 {
     for (int y = 0; y < m_height; y++)

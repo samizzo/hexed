@@ -2,7 +2,7 @@
 #include "Log.h"
 #include <assert.h>
 
-HexView::HexView(const char* filename, Window* parent) : Window(parent)
+HexView::HexView(const char* filename)
 {
     m_buffer = 0;
     m_topLine = 0;

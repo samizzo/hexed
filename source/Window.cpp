@@ -7,17 +7,8 @@ Window::Window()
 {
     m_width = 0;
     m_height = 0;
-    m_flags = Flags_Visible | Flags_Focus;
-    m_parent = 0;
+    m_flags = Flags_Visible;
     Add(this);
-}
-
-Window::Window(Window* parent)
-{
-    m_flags = Flags_Visible | Flags_Focus;
-    m_width = 0;
-    m_height = 0;
-    parent->AddChild(this);
 }
 
 void Window::SetConsoleBuffer(ConsoleBuffer* buffer)
@@ -66,49 +57,17 @@ void Window::ProcessKeyInput(KeyEvent& keyEvent)
     }
 }
 
-void Window::OnKeyEvent(KeyEvent& keyEvent)
-{
-    for (size_t i = 0; i < m_children.size(); i++)
-    {
-        Window* window = m_children[i];
-        if (window->IsVisible() && window->HasFocus())
-            window->OnKeyEvent(keyEvent);
-    }
-}
-
-void Window::OnWindowRefreshed()
-{
-    for (size_t i = 0; i < m_children.size(); i++)
-    {
-        Window* window = m_children[i];
-        if (window->IsVisible())
-            window->OnWindowRefreshed();
-    }
-}
-
 void Window::OnWindowResized(int width, int height)
 {
     m_width = width;
     m_height = height;
-    for (size_t i = 0; i < m_children.size(); i++)
-    {
-        Window* window = m_children[i];
-        if (window->IsVisible())
-            window->OnWindowResized(width, height);
-    }
-}
-
-void Window::AddChild(Window* window)
-{
-    m_children.push_back(window);
-    window->m_parent = this;
 }
 
 void Window::SetVisible(bool visible)
 {
     m_flags = visible ? m_flags | Flags_Visible : m_flags & ~Flags_Visible;
-    if (m_parent && IsVisible())
-        OnWindowResized(m_parent->m_width, m_parent->m_height);
+    if (IsVisible())
+        OnWindowResized(s_consoleBuffer->GetWidth(), s_consoleBuffer->GetHeight());
     Window::Refresh(true);
 }
 
