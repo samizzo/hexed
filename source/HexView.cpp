@@ -145,15 +145,13 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 {
     Window::OnKeyEvent(keyEvent);
 
-    const KEY_EVENT_RECORD& ker = keyEvent.GetEvent();
-
-    if (!ker.bKeyDown)
+    if (!keyEvent.IsKeyDown())
         return;
 
     bool refresh = true;
     bool fullDraw = false;
 
-    switch (ker.wVirtualKeyCode)
+    switch (keyEvent.GetVKKeyCode())
     {
         case VK_LEFT:
         {
@@ -231,8 +229,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 
         case VK_HOME:
         {
-            DWORD ctrl = ker.dwControlKeyState;
-            if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
+            if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
             {
                 m_selected = 0;
                 m_topLine = 0;
@@ -248,8 +245,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 
         case VK_END:
         {
-            DWORD ctrl = ker.dwControlKeyState;
-            if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
+            if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
             {
                 m_selected = m_fileSize - 1;
                 int selectedLine = GetSelectedLine();
@@ -270,8 +266,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
             // Current selection column in the last line.
             int lastLineSelected = min(((m_fileSize - 1) & ~0xf) | (m_selected & 0xf), m_fileSize - 1);
 
-            DWORD ctrl = ker.dwControlKeyState;
-            if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
+            if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
             {
                 // Control is down. Go to the bottom of the current page.
                 int bottomLine = GetBottomLine();
@@ -307,8 +302,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
         // Page up.
         case VK_PRIOR:
         {
-            DWORD ctrl = ker.dwControlKeyState;
-            if ((ctrl & LEFT_CTRL_PRESSED) || (ctrl & RIGHT_CTRL_PRESSED))
+            if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
             {
                 // Control is down. Go to the top of the current page.
                 // Select the offset at the top of the current page.

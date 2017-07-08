@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "HexView.h"
+#include "ConsoleBuffer.h"
 #include <stdio.h>
 #include <string>
 #include "Error.h"
@@ -91,7 +92,7 @@ void ProcessInput(const INPUT_RECORD& inputRecord)
             const KEY_EVENT_RECORD& ker = inputRecord.Event.KeyEvent;
             if (ker.wVirtualKeyCode == VK_ESCAPE && !ker.bKeyDown)
                 s_running = false;
-            KeyEvent keyEvent(ker);
+            KeyEvent keyEvent(ker.bKeyDown == TRUE, ker.wVirtualKeyCode, ker.dwControlKeyState);
             Window::ProcessKeyInput(keyEvent);
             break;
         }

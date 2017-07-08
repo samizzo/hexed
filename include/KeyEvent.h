@@ -1,24 +1,38 @@
 #pragma once
 
-#include <Windows.h>
-
 class KeyEvent
 {
     public:
-        KeyEvent(KEY_EVENT_RECORD ker);
+        KeyEvent(bool keyDown, unsigned short vkKeyCode, unsigned long controlKeyState);
 
-        const KEY_EVENT_RECORD& GetEvent();
+        bool IsKeyDown() const;
+        unsigned short GetVKKeyCode() const;
+        bool IsControlKeyDown(int controlKey) const;
 
     private:
-        KEY_EVENT_RECORD m_ker;
+        bool m_keyDown;
+        unsigned short m_vkKeyCode;
+        unsigned long m_controlKeyState;
 };
 
-inline KeyEvent::KeyEvent(KEY_EVENT_RECORD ker)
+inline KeyEvent::KeyEvent(bool keyDown, unsigned short vkKeyCode, unsigned long controlKeyState)
 {
-    m_ker = ker;
+    m_keyDown = keyDown;
+    m_vkKeyCode = vkKeyCode;
+    m_controlKeyState = controlKeyState;
 }
 
-inline const KEY_EVENT_RECORD& KeyEvent::GetEvent()
+inline bool KeyEvent::IsKeyDown() const
 {
-    return m_ker;
+    return m_keyDown;
+}
+
+inline unsigned short KeyEvent::GetVKKeyCode() const
+{
+    return m_vkKeyCode;
+}
+
+inline bool KeyEvent::IsControlKeyDown(int controlKey) const
+{
+    return (m_controlKeyState & controlKey) != 0;
 }
