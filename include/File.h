@@ -7,23 +7,23 @@ class File
 
         bool Open(const char* path);
         void Close();
-        int GetSize() const;
-        void Seek(int position);
-        void Read(void* buffer, int size);
+        unsigned int GetSize() const;
+        void Seek(unsigned int position);
+        void Read(void* buffer, unsigned int size);
         bool IsOpen() const;
 
     private:
         const char* m_path;
-        int m_filesize;
-        void* m_fp;
+        unsigned int m_filesize;
+        void* m_handle;
 };
 
-inline int File::GetSize() const
+inline unsigned int File::GetSize() const
 {
     return m_filesize;
 }
 
 inline bool File::IsOpen() const
 {
-    return m_fp != 0;
+    return m_handle != 0;
 }
