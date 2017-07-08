@@ -1,15 +1,14 @@
 #include "Window.h"
 
-std::vector<Window*> Window::s_rootWindows;
-std::vector<Window*> Window::s_focusWindows;
+std::vector<Window*> Window::s_visibleWindows;
 ConsoleBuffer* Window::s_consoleBuffer;
 
 Window::Window()
 {
     m_width = 0;
     m_height = 0;
-    m_flags = Flags_Visible;
-    Add(this);
+    m_flags = 0;
+    SetVisible(true);
 }
 
 void Window::SetConsoleBuffer(ConsoleBuffer* buffer)
@@ -19,15 +18,15 @@ void Window::SetConsoleBuffer(ConsoleBuffer* buffer)
 
 void Window::Add(Window* window)
 {
-    s_rootWindows.push_back(window);
+    s_visibleWindows.push_back(window);
 }
 
 void Window::Resize(int width, int height)
 {
     s_consoleBuffer->OnWindowResize(width, height);
-    for (size_t i = 0; i < s_rootWindows.size(); i++)
+    for (size_t i = 0; i < s_visibleWindows.size(); i++)
     {
-        Window* window = s_rootWindows[i];
+        Window* window = s_visibleWindows[i];
         if (window->IsVisible())
             window->OnWindowResized(width, height);
     }
@@ -35,12 +34,12 @@ void Window::Resize(int width, int height)
 
 void Window::Refresh(bool fullDraw)
 {
-    if (!s_consoleBuffer->IsInitialised())
+    if (!s_consoleBuffer || !s_consoleBuffer->IsInitialised())
         return;
 
-    for (size_t i = 0; i < s_rootWindows.size(); i++)
+    for (size_t i = 0; i < s_visibleWindows.size(); i++)
     {
-        Window* window = s_rootWindows[i];
+        Window* window = s_visibleWindows[i];
         if (window->IsVisible())
             window->OnWindowRefreshed();
     }
@@ -50,10 +49,10 @@ void Window::Refresh(bool fullDraw)
 
 void Window::ProcessKeyInput(KeyEvent& keyEvent)
 {
-    // Input is processed in order of focussed window.
-    for (int i = (int)s_focusWindows.size() - 1; i >= 0; i--)
+    // Input is processed in visiblity order.
+    for (int i = (int)s_visibleWindows.size() - 1; i >= 0; i--)
     {
-        Window* window = s_focusWindows[i];
+        Window* window = s_visibleWindows[i];
         window->OnKeyEvent(keyEvent);
 
         // If a window handled the event, no other windows will handled it.
@@ -72,35 +71,40 @@ void Window::SetVisible(bool visible)
 {
     m_flags = visible ? m_flags | Flags_Visible : m_flags & ~Flags_Visible;
     if (IsVisible())
-        OnWindowResized(s_consoleBuffer->GetWidth(), s_consoleBuffer->GetHeight());
+    {
+        if (s_consoleBuffer && s_consoleBuffer->IsInitialised())
+            OnWindowResized(s_consoleBuffer->GetWidth(), s_consoleBuffer->GetHeight());
 
-    SetFocus(IsVisible());
+        // Remove from the visible list first.
+        for (size_t i = 0; i < s_visibleWindows.size(); i++)
+        {
+            if (s_visibleWindows[i] == this)
+            {
+                s_visibleWindows.erase(s_visibleWindows.begin() + i);
+                break;
+            }
+        }
+
+        // Now add to the end.
+        s_visibleWindows.push_back(this);
+    }
+    else
+    {
+        // Remove from the visible list.
+        for (size_t i = 0; i < s_visibleWindows.size(); i++)
+        {
+            if (s_visibleWindows[i] == this)
+            {
+                s_visibleWindows.erase(s_visibleWindows.begin() + i);
+                break;
+            }
+        }
+    }
+
     Window::Refresh(true);
 }
 
 bool Window::IsVisible() const
 {
     return (m_flags & Flags_Visible) != 0;
-}
-
-void Window::SetFocus(bool focus)
-{
-    if (focus)
-    {
-        // We remove focus first in case the window was already in the focus list.
-        // This way it will be forced to have focus and be topmost.
-        SetFocus(false);
-        s_focusWindows.push_back(this);
-    }
-    else
-    {
-        for (size_t i = 0; i < s_focusWindows.size(); i++)
-        {
-            if (s_focusWindows[i] == this)
-            {
-                s_focusWindows.erase(s_focusWindows.begin() + i);
-                break;
-            }
-        }
-    }
 }

@@ -16,7 +16,6 @@ class Window
 
         void SetVisible(bool visible);
         bool IsVisible() const;
-        void SetFocus(bool focus);
 
         static void SetConsoleBuffer(ConsoleBuffer* buffer);
         static void Add(Window* window);
@@ -38,6 +37,5 @@ class Window
 
         unsigned int m_flags;
 
-        static std::vector<Window*> s_rootWindows;
-        static std::vector<Window*> s_focusWindows;
+        static std::vector<Window*> s_visibleWindows;
 };

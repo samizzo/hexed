@@ -7,8 +7,6 @@ static const int MAX_FILENAME_SIZE = 32;
 MainWindow::MainWindow(const char* filename) :
 m_hexView(filename)
 {
-    SetFocus(true);
-    m_hexView.SetFocus(true);
     m_helpWindow.SetVisible(false);
 
     GetFullPathName(filename, MAX_PATH, m_fullPath, &m_filename);
