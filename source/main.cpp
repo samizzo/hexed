@@ -54,8 +54,8 @@ int main(int argc, char** argv)
         CONSOLE_SCREEN_BUFFER_INFO info;
         if (GetConsoleScreenBufferInfo(stdoutHandle, &info))
         {
-            int newWidth = info.srWindow.Right - info.srWindow.Left + 1;
-            int newHeight = info.srWindow.Bottom - info.srWindow.Top + 1;
+            int newWidth = info.dwSize.X;
+            int newHeight = info.dwSize.Y;
             if (newWidth != width || newHeight != height)
             {
                 width = newWidth;
