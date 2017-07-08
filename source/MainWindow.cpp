@@ -5,8 +5,11 @@
 static const int MAX_FILENAME_SIZE = 32;
 
 MainWindow::MainWindow(const char* filename) :
-m_hexView(filename, this)
+m_hexView(filename, this),
+m_helpWindow(this)
 {
+    m_helpWindow.SetVisible(false);
+
     GetFullPathName(filename, MAX_PATH, m_fullPath, &m_filename);
 
     // If full path is too long, just show the filename.
@@ -38,5 +41,27 @@ void MainWindow::OnWindowRefreshed()
     int fileSize = max(m_hexView.GetFileSize() - 1, 0);
     s_consoleBuffer->Write(m_width - 20, 0, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08X / %08X", selectedOffset, fileSize);
 
+    s_consoleBuffer->Write(0, m_height - 1, BACKGROUND_GREEN | BACKGROUND_RED,  " F1 Help    ");
+    //s_consoleBuffer->Write(14, m_height - 1, BACKGROUND_GREEN | BACKGROUND_RED, " F2 Colours ");
+
     Window::OnWindowRefreshed();
+}
+
+void MainWindow::OnKeyEvent(KeyEvent& keyEvent)
+{
+    Window::OnKeyEvent(keyEvent);
+
+    unsigned short vkKeyCode = keyEvent.GetVKKeyCode();
+    switch (vkKeyCode)
+    {
+        case VK_F1:
+        {
+            if (!keyEvent.IsKeyDown())
+            {
+                m_helpWindow.SetVisible(true);
+            }
+
+            break;
+        }
+    }
 }

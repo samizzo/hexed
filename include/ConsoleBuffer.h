@@ -8,6 +8,7 @@ class ConsoleBuffer
         ConsoleBuffer(HANDLE stdoutHandle);
         ~ConsoleBuffer();
 
+        bool IsInitialised() const;
         void Write(int x, int y, WORD attributes, const char* format, ...);
         void FillLine(int y, char c, WORD attributes);
         void FillRect(int x, int y, int width, int height, char c, WORD attributes);
@@ -22,3 +23,8 @@ class ConsoleBuffer
         CHAR_INFO* m_backBuffer;
         HANDLE m_stdoutHandle;
 };
+
+inline bool ConsoleBuffer::IsInitialised() const
+{
+    return m_buffer != 0;
+}

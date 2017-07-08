@@ -3,7 +3,6 @@
 #include "ConsoleBuffer.h"
 #include "KeyEvent.h"
 #include <vector>
-#include <algorithm>
 #include <assert.h>
 
 class Window
@@ -18,6 +17,9 @@ class Window
 
         void AddChild(Window* window);
 
+        void SetVisible(bool visible);
+        bool IsVisible() const;
+
         static void SetConsoleBuffer(ConsoleBuffer* buffer);
         static void Add(Window* window);
         static void Resize(int width, int height);
@@ -27,11 +29,13 @@ class Window
     protected:
         int m_width;
         int m_height;
+        Window* m_parent;
 
         static ConsoleBuffer* s_consoleBuffer;
 
     private:
         std::vector<Window*> m_children;
+        bool m_visible;
 
         static std::vector<Window*> s_rootWindows;
 };
@@ -40,6 +44,8 @@ inline Window::Window()
 {
     m_width = 0;
     m_height = 0;
+    m_visible = true;
+    m_parent = 0;
     Add(this);
 }
 
@@ -64,13 +70,24 @@ inline void Window::Resize(int width, int height)
 {
     s_consoleBuffer->OnWindowResize(width, height);
     for (size_t i = 0; i < s_rootWindows.size(); i++)
-        s_rootWindows[i]->OnWindowResized(width, height);
+    {
+        Window* window = s_rootWindows[i];
+        if (window->IsVisible())
+            window->OnWindowResized(width, height);
+    }
 }
 
 inline void Window::Refresh(bool fullDraw)
 {
+    if (!s_consoleBuffer->IsInitialised())
+        return;
+
     for (size_t i = 0; i < s_rootWindows.size(); i++)
-        s_rootWindows[i]->OnWindowRefreshed();
+    {
+        Window* window = s_rootWindows[i];
+        if (window->IsVisible())
+            window->OnWindowRefreshed();
+    }
     assert(s_consoleBuffer);
     s_consoleBuffer->Flush(fullDraw);
 }
@@ -78,19 +95,31 @@ inline void Window::Refresh(bool fullDraw)
 inline void Window::ProcessKeyInput(KeyEvent& keyEvent)
 {
     for (size_t i = 0; i < s_rootWindows.size(); i++)
-        s_rootWindows[i]->OnKeyEvent(keyEvent);
+    {
+        Window* window = s_rootWindows[i];
+        if (window->IsVisible())
+            window->OnKeyEvent(keyEvent);
+    }
 }
 
 inline void Window::OnKeyEvent(KeyEvent& keyEvent)
 {
     for (size_t i = 0; i < m_children.size(); i++)
-        m_children[i]->OnKeyEvent(keyEvent);
+    {
+        Window* window = m_children[i];
+        if (window->IsVisible())
+            window->OnKeyEvent(keyEvent);
+    }
 }
 
 inline void Window::OnWindowRefreshed()
 {
     for (size_t i = 0; i < m_children.size(); i++)
-        m_children[i]->OnWindowRefreshed();
+    {
+        Window* window = m_children[i];
+        if (window->IsVisible())
+            window->OnWindowRefreshed();
+    }
 }
 
 inline void Window::OnWindowResized(int width, int height)
@@ -98,10 +127,28 @@ inline void Window::OnWindowResized(int width, int height)
     m_width = width;
     m_height = height;
     for (size_t i = 0; i < m_children.size(); i++)
-        m_children[i]->OnWindowResized(width, height);
+    {
+        Window* window = m_children[i];
+        if (window->IsVisible())
+            window->OnWindowResized(width, height);
+    }
 }
 
 inline void Window::AddChild(Window* window)
 {
     m_children.push_back(window);
+    window->m_parent = this;
+}
+
+inline void Window::SetVisible(bool visible)
+{
+    m_visible = visible;
+    if (m_parent && m_visible)
+        OnWindowResized(m_parent->m_width, m_parent->m_height);
+    Window::Refresh(false);
+}
+
+inline bool Window::IsVisible() const
+{
+    return m_visible;
 }
