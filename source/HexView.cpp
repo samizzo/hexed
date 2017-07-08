@@ -131,8 +131,6 @@ void HexView::CacheFile(bool resizeBuffer)
 
 void HexView::OnKeyEvent(KeyEvent& keyEvent)
 {
-    Window::OnKeyEvent(keyEvent);
-
     if (!keyEvent.IsKeyDown())
         return;
 

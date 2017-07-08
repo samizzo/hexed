@@ -48,8 +48,6 @@ void MainWindow::OnWindowRefreshed()
 
 void MainWindow::OnKeyEvent(KeyEvent& keyEvent)
 {
-    Window::OnKeyEvent(keyEvent);
-
     unsigned short vkKeyCode = keyEvent.GetVKKeyCode();
     switch (vkKeyCode)
     {
