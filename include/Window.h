@@ -145,7 +145,7 @@ inline void Window::SetVisible(bool visible)
     m_visible = visible;
     if (m_parent && m_visible)
         OnWindowResized(m_parent->m_width, m_parent->m_height);
-    Window::Refresh(false);
+    Window::Refresh(true);
 }
 
 inline bool Window::IsVisible() const
