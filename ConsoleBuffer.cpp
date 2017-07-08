@@ -138,6 +138,12 @@ void ConsoleBuffer::Flush(bool fullDraw)
                 //{
                 //    bufferSize.X = 1;
                 //    bufferSize.Y = 1;
+                //    coord.X = 0;
+                //    coord.Y = 0;
+                //    rect.Top = y;
+                //    rect.Left = x;
+                //    rect.Bottom = y;
+                //    rect.Right = x;
                 //    bc.Attributes = c.Attributes;
                 //    bc.Char.AsciiChar = c.Char.AsciiChar;
                 //    WriteConsoleOutput(m_stdoutHandle, &c, bufferSize, coord, &rect);
