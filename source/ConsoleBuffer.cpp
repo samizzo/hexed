@@ -78,7 +78,11 @@ void ConsoleBuffer::Clear()
     assert(m_height > 0);
 
     for (int i = 0; i < m_width * m_height; i++)
-        m_buffer[i].Char.AsciiChar = ' ';
+    {
+        CHAR_INFO& info = m_buffer[i];
+        info.Char.AsciiChar = ' ';
+        info.Attributes = 0;
+    }
 }
 
 void ConsoleBuffer::OnWindowResize(int width, int height)
