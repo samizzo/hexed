@@ -13,6 +13,9 @@ class HexView : public Window
         virtual void OnWindowResized(int newWidth, int newHeight);
         virtual void OnKeyEvent(KeyEvent& keyEvent);
 
+        int GetSelectedOffset();
+        int GetFileSize();
+
     private:
         void CacheFile(bool resizeBuffer = false);
 
@@ -41,4 +44,14 @@ inline int HexView::GetLastLine()
 inline int HexView::GetBottomLine()
 {
     return m_topLine + m_height - 1;
+}
+
+inline int HexView::GetSelectedOffset()
+{
+    return m_selected;
+}
+
+inline int HexView::GetFileSize()
+{
+    return m_fileSize;
 }

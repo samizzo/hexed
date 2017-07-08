@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.h"
+#include "HexView.h"
 
 class MainWindow : public Window
 {
@@ -10,4 +11,5 @@ class MainWindow : public Window
 
     private:
         const char* m_filename;
+        HexView m_hexView;
 };
