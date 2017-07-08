@@ -10,6 +10,8 @@ class ConsoleBuffer
 
         bool IsInitialised() const;
         void Write(int x, int y, WORD attributes, const char* format, ...);
+		void SetAttributes(int x, int y, WORD attributes);
+		void DrawWindow(int x, int y, int width, int height, WORD colour);
         void FillLine(int y, char c, WORD attributes);
         void FillRect(int x, int y, int width, int height, char c, WORD attributes);
         void Clear();

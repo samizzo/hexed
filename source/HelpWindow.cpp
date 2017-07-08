@@ -2,19 +2,14 @@
 
 void HelpWindow::OnWindowRefreshed()
 {
-    for (int y = 0; y < m_height; y++)
-    {
-        for (int x = 0; x < m_width; x++)
-        {
-            s_consoleBuffer->Write(x + m_x, y + m_y, FOREGROUND_BLUE, "%c", 219);
-        }
-    }
+	WORD colour = FOREGROUND_INTENSITY | BACKGROUND_GREEN;
+	s_consoleBuffer->DrawWindow(m_x, m_y, m_width, m_height, colour);
 }
 
 void HelpWindow::OnWindowResized(int width, int height)
 {
-    int newWidth = width >> 1;
-    int newHeight = height >> 1;
+    int newWidth = (int)(width * 0.8f);
+    int newHeight = (int)(height * 0.8f);
     Window::OnWindowResized(newWidth, newHeight);
 
     m_x = (width - newWidth) >> 1;

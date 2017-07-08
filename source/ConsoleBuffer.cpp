@@ -40,6 +40,58 @@ void ConsoleBuffer::Write(int x, int y, WORD attributes, const char* format, ...
     va_end(args);
 }
 
+void ConsoleBuffer::SetAttributes(int x, int y, WORD attributes)
+{
+	assert(m_buffer != 0);
+	assert(m_width > 0);
+	assert(m_height > 0);
+
+	int offset = x + (y * m_width);
+	m_buffer[offset].Attributes = attributes;
+}
+
+void ConsoleBuffer::DrawWindow(int x, int y, int width, int height, WORD colour)
+{
+	WORD shadowColour = BACKGROUND_BLUE;
+
+	for (int j = 0; j < height; j++)
+	{
+		for (int i = 0; i < width; i++)
+		{
+			unsigned char c = ' ';
+
+			// Horizontal border.
+			if (j == 0 || j == height - 1)
+				c = 205;
+
+			Write(i + x, j + y, colour, "%c", c);
+
+			if (j == 0)
+			{
+				// Bottom shadow.
+				SetAttributes(i + x + 2, y + height, BACKGROUND_BLUE);
+			}
+		}
+
+		// Vertical border.
+		if (j > 0 && j < height - 1)
+		{
+			Write(x, j + y, colour, "%c", 186);
+			Write(x + width - 1, j + y, colour, "%c", 186);
+		}
+
+		// Right shadow.
+		SetAttributes(x + width, j + y + 1, shadowColour);
+		SetAttributes(x + width + 1, j + y + 1, shadowColour);
+	}
+
+	// Corners of box.
+	Write(x, y, colour, "%c", 201);
+	Write(x + width - 1, y, colour, "%c", 187);
+	Write(x, y + height - 1, colour, "%c", 200);
+	Write(x + width - 1, y + height - 1, colour, "%c", 188);
+}
+
 void ConsoleBuffer::FillLine(int y, char c, WORD attributes)
 {
     assert(m_buffer != 0);
