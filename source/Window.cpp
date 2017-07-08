@@ -87,6 +87,9 @@ void Window::SetFocus(bool focus)
 {
     if (focus)
     {
+        // We remove focus first in case the window was already in the focus list.
+        // This way it will be forced to have focus and be topmost.
+        SetFocus(false);
         s_focusWindows.push_back(this);
     }
     else
