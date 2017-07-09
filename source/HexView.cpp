@@ -178,6 +178,12 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 	}
 	else if (m_editMode == EditMode_Char)
 	{
+		unsigned char ascii = keyEvent.GetAscii();
+		if (ascii >= 32 && ascii < 127)
+		{
+			WriteChar((unsigned char)ascii);
+			vkCode = VK_RIGHT;
+		}
 	}
 
     switch (vkCode)
@@ -445,6 +451,16 @@ void HexView::WriteBytes(unsigned char ascii)
 	b = (b & ~mask) | (value << (4 * m_nibbleIndex));
 	m_buffer[bufferIndex] = b;
 
+	m_file.Seek(m_selected);
+	m_file.Write(m_buffer + bufferIndex, 1);
+}
+
+void HexView::WriteChar(unsigned char ascii)
+{
+	// Write chars to the buffer.
+	int bufferIndex = m_selected - (m_topLine << 4);
+	assert(bufferIndex >= 0 && bufferIndex < m_bufferSize);
+	m_buffer[bufferIndex] = ascii;
 	m_file.Seek(m_selected);
 	m_file.Write(m_buffer + bufferIndex, 1);
 }

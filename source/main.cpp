@@ -88,7 +88,7 @@ void ProcessInput(const INPUT_RECORD& inputRecord)
         case KEY_EVENT:
         {
             const KEY_EVENT_RECORD& ker = inputRecord.Event.KeyEvent;
-            KeyEvent keyEvent(ker.bKeyDown == TRUE, ker.wVirtualKeyCode, ker.uChar.AsciiChar, ker.dwControlKeyState);
+            KeyEvent keyEvent(ker.bKeyDown == TRUE, ker.wVirtualKeyCode, ker.wVirtualScanCode, ker.uChar.AsciiChar, ker.dwControlKeyState);
             Window::ProcessKeyInput(keyEvent);
             if (!keyEvent.WasHandled() && ker.wVirtualKeyCode == VK_ESCAPE && !ker.bKeyDown)
                 s_running = false;

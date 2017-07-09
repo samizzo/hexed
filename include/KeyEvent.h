@@ -3,12 +3,13 @@
 class KeyEvent
 {
     public:
-        KeyEvent(bool keyDown, unsigned short vkKeyCode, unsigned char ascii, unsigned long controlKeyState);
+        KeyEvent(bool keyDown, unsigned short vkKeyCode, unsigned short scanCode, unsigned char ascii, unsigned long controlKeyState);
 
         bool IsKeyDown() const;
         bool IsControlKeyDown(int controlKey) const;
 
 		unsigned short GetVKKeyCode() const;
+		unsigned short GetScanCode() const;
 		unsigned char GetAscii() const;
 
         bool WasHandled() const;
@@ -18,15 +19,17 @@ class KeyEvent
         bool m_handled;
         bool m_keyDown;
         unsigned short m_vkKeyCode;
+		unsigned short m_scanCode;
 		unsigned char m_ascii;
         unsigned long m_controlKeyState;
 };
 
-inline KeyEvent::KeyEvent(bool keyDown, unsigned short vkKeyCode, unsigned char ascii, unsigned long controlKeyState)
+inline KeyEvent::KeyEvent(bool keyDown, unsigned short vkKeyCode, unsigned short scanCode, unsigned char ascii, unsigned long controlKeyState)
 {
     m_handled = false;
     m_keyDown = keyDown;
     m_vkKeyCode = vkKeyCode;
+	m_scanCode = scanCode;
 	m_ascii = ascii;
     m_controlKeyState = controlKeyState;
 }
@@ -39,6 +42,11 @@ inline bool KeyEvent::IsKeyDown() const
 inline unsigned short KeyEvent::GetVKKeyCode() const
 {
     return m_vkKeyCode;
+}
+
+inline unsigned short KeyEvent::GetScanCode() const
+{
+	return m_scanCode;
 }
 
 inline unsigned char KeyEvent::GetAscii() const

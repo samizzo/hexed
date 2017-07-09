@@ -20,6 +20,7 @@ class HexView : public Window
 		void UpdateCursor();
         void CacheFile(bool resizeBuffer = false);
 		void WriteBytes(unsigned char ascii);
+		void WriteChar(unsigned char ascii);
 
         int GetSelectedLine();
         int GetLastLine();
