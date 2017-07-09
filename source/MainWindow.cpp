@@ -41,8 +41,7 @@ void MainWindow::OnWindowRefreshed()
     int fileSize = max(m_hexView.GetFileSize() - 1, 0);
     s_consoleBuffer->Write(m_width - 20, 0, Colours::StatusBar, "%08X / %08X", selectedOffset, fileSize);
 
-    s_consoleBuffer->Write(0, m_height - 1, Colours::FunctionButton,  " F1 Help    ");
-    //s_consoleBuffer->Write(14, m_height - 1, BACKGROUND_GREEN | BACKGROUND_RED, " F2 Colours ");
+    //s_consoleBuffer->Write(0, m_height - 1, Colours::FunctionButton,  " F1 Help    ");
 }
 
 void MainWindow::OnKeyEvent(KeyEvent& keyEvent)
@@ -52,10 +51,10 @@ void MainWindow::OnKeyEvent(KeyEvent& keyEvent)
     {
         case VK_F1:
         {
-            if (!keyEvent.IsKeyDown())
+            /*if (!keyEvent.IsKeyDown())
             {
                 m_helpWindow.SetVisible(true);
-            }
+            }*/
 
             break;
         }
