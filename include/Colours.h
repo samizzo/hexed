@@ -3,7 +3,7 @@
 #define COLOUR(fg, bg) (fg | (bg << 4))
 #define BG(c) (c >> 4)
 
-#define BACKGROUND COLOUR(0, 1)
+#define BACKGROUND COLOUR(0, 0)
 
 class Colours
 {
