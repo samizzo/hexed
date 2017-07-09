@@ -1,5 +1,6 @@
 #include "HexView.h"
 #include "Log.h"
+#include "Colours.h"
 #include <assert.h>
 
 HexView::HexView(const char* filename)
@@ -36,7 +37,7 @@ void HexView::OnWindowRefreshed()
 
         int curr = (m_selected >> 4) * (m_height - 1) / ((m_fileSize - 1) >> 4);
         char c = j == curr ? 178 : 176;
-        s_consoleBuffer->Write(0, y, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY, "%c", c);
+        s_consoleBuffer->Write(0, y, Colours::Scrollbar, "%c", c);
 
         if (done)
             continue;
@@ -44,11 +45,11 @@ void HexView::OnWindowRefreshed()
         if ((offset >> 4) == selectedLine)
         {
             // Highlight the selected line's offset text.
-            colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+			colour = Colours::HexViewHighlight;
         }
         else
         {
-            colour = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+			colour = Colours::HexViewOffsetNormal;
         }
 
         s_consoleBuffer->Write(x, y, colour, "%08X", offset);
@@ -69,11 +70,11 @@ void HexView::OnWindowRefreshed()
             if (offset == m_selected)
             {
                 // Highlight the selected byte.
-                colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+				colour = Colours::HexViewHighlight;
             }
             else
             {
-                colour = FOREGROUND_GREEN;
+				colour = Colours::HexViewByteNormal;
             }
 
             int xx = x + (i * 3);
@@ -86,11 +87,11 @@ void HexView::OnWindowRefreshed()
             if (offset == m_selected)
             {
                 // Highlight the selected character.
-                colour = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_INTENSITY;
+				colour = Colours::HexViewHighlight;
             }
             else
             {
-                colour = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+				colour = Colours::HexViewCharNormal;
             }
             s_consoleBuffer->Write(xx, y, colour, "%c", c);
         }

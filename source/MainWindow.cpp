@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "Path.h"
+#include "Colours.h"
 #include <assert.h>
 
 static const int MAX_FILENAME_SIZE = 32;
@@ -31,16 +32,16 @@ m_hexView(filename)
 
 void MainWindow::OnWindowRefreshed()
 {
-    s_consoleBuffer->Clear();
-    s_consoleBuffer->FillLine(0, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
-    s_consoleBuffer->Write(1, 0, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, m_fullPath);
-    s_consoleBuffer->FillLine(m_height - 1, ' ', BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED);
+    s_consoleBuffer->Clear(Colours::Background);
+    s_consoleBuffer->FillLine(0, ' ', Colours::StatusBar);
+    s_consoleBuffer->Write(1, 0, Colours::StatusBar, m_fullPath);
+    s_consoleBuffer->FillLine(m_height - 1, ' ', Colours::StatusBar);
 
     int selectedOffset = m_hexView.GetSelectedOffset();
     int fileSize = max(m_hexView.GetFileSize() - 1, 0);
-    s_consoleBuffer->Write(m_width - 20, 0, BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED, "%08X / %08X", selectedOffset, fileSize);
+    s_consoleBuffer->Write(m_width - 20, 0, Colours::StatusBar, "%08X / %08X", selectedOffset, fileSize);
 
-    s_consoleBuffer->Write(0, m_height - 1, BACKGROUND_GREEN | BACKGROUND_RED,  " F1 Help    ");
+    s_consoleBuffer->Write(0, m_height - 1, Colours::FunctionButton,  " F1 Help    ");
     //s_consoleBuffer->Write(14, m_height - 1, BACKGROUND_GREEN | BACKGROUND_RED, " F2 Colours ");
 }
 

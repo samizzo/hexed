@@ -14,7 +14,7 @@ class ConsoleBuffer
 		void DrawWindow(int x, int y, int width, int height, WORD colour);
         void FillLine(int y, char c, WORD attributes);
         void FillRect(int x, int y, int width, int height, char c, WORD attributes);
-        void Clear();
+        void Clear(WORD clearColour);
         void OnWindowResize(int width, int height);
         void Flush(bool fullDraw);
 

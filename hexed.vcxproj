@@ -32,6 +32,7 @@
     <ClCompile Include="source\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Colours.h" />
     <ClInclude Include="include\ConsoleBuffer.h" />
     <ClInclude Include="include\Error.h" />
     <ClInclude Include="include\File.h" />

@@ -1,4 +1,5 @@
 #include "ConsoleBuffer.h"
+#include "Colours.h"
 #include <assert.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -52,7 +53,7 @@ void ConsoleBuffer::SetAttributes(int x, int y, WORD attributes)
 
 void ConsoleBuffer::DrawWindow(int x, int y, int width, int height, WORD colour)
 {
-	WORD shadowColour = BACKGROUND_BLUE;
+	WORD shadowColour = Colours::Shadow;
 
 	for (int j = 0; j < height; j++)
 	{
@@ -69,7 +70,7 @@ void ConsoleBuffer::DrawWindow(int x, int y, int width, int height, WORD colour)
 			if (j == 0)
 			{
 				// Bottom shadow.
-				SetAttributes(i + x + 2, y + height, BACKGROUND_BLUE);
+				SetAttributes(i + x + 2, y + height, shadowColour);
 			}
 		}
 
@@ -123,7 +124,7 @@ void ConsoleBuffer::FillRect(int x, int y, int width, int height, char c, WORD a
     }
 }
 
-void ConsoleBuffer::Clear()
+void ConsoleBuffer::Clear(WORD clearColour)
 {
     assert(m_buffer != 0);
     assert(m_width > 0);
@@ -133,7 +134,7 @@ void ConsoleBuffer::Clear()
     {
         CHAR_INFO& info = m_buffer[i];
         info.Char.AsciiChar = ' ';
-        info.Attributes = 0;
+        info.Attributes = clearColour;
     }
 }
 
