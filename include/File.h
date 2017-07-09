@@ -10,6 +10,7 @@ class File
         unsigned int GetSize() const;
         void Seek(unsigned int position);
         void Read(void* buffer, unsigned int size);
+		void Write(void* buffer, unsigned int size);
         bool IsOpen() const;
 
     private:

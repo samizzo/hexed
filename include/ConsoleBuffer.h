@@ -18,8 +18,12 @@ class ConsoleBuffer
         void OnWindowResize(int width, int height);
         void Flush(bool fullDraw);
 
+		void SetCursor(bool visible, unsigned int size);
+
         int GetWidth() const;
         int GetHeight() const;
+
+		HANDLE GetStdoutHandle() const;
 
     private:
         int m_width;
@@ -42,4 +46,9 @@ inline int ConsoleBuffer::GetWidth() const
 inline int ConsoleBuffer::GetHeight() const
 {
     return m_height;
+}
+
+inline HANDLE ConsoleBuffer::GetStdoutHandle() const
+{
+	return m_stdoutHandle;
 }

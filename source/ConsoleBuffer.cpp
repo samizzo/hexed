@@ -223,3 +223,11 @@ void ConsoleBuffer::Flush(bool fullDraw)
         }
     }
 }
+
+void ConsoleBuffer::SetCursor(bool visible, unsigned int size)
+{
+	CONSOLE_CURSOR_INFO info;
+	info.bVisible = visible;
+	info.dwSize = size;
+	SetConsoleCursorInfo(m_stdoutHandle, &info);
+}

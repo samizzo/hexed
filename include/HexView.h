@@ -17,7 +17,9 @@ class HexView : public Window
         int GetFileSize();
 
     private:
+		void UpdateCursor();
         void CacheFile(bool resizeBuffer = false);
+		void WriteBytes(unsigned char ascii);
 
         int GetSelectedLine();
         int GetLastLine();
@@ -29,6 +31,16 @@ class HexView : public Window
         int m_topLine;
         int m_selected;
         int m_fileSize;
+
+		enum EditMode
+		{
+			EditMode_None,
+			EditMode_Byte,
+			EditMode_Char
+		};
+
+		EditMode m_editMode;
+		int m_nibbleIndex;
 };
 
 inline int HexView::GetSelectedLine()
