@@ -14,10 +14,15 @@ bool File::Open(const char* path)
     m_path = path;
 
     m_handle = CreateFile(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-    if (m_handle)
+    if (m_handle != INVALID_HANDLE_VALUE)
         m_filesize = GetFileSize(m_handle, 0);
 
     return m_handle != 0;
+}
+
+bool File::IsOpen() const
+{
+	return m_handle != INVALID_HANDLE_VALUE;
 }
 
 void File::Close()

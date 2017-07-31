@@ -24,7 +24,3 @@ inline unsigned int File::GetSize() const
     return m_filesize;
 }
 
-inline bool File::IsOpen() const
-{
-    return m_handle != 0;
-}
