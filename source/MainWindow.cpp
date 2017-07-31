@@ -5,26 +5,26 @@
 
 static const int MAX_FILENAME_SIZE = 32;
 
-MainWindow::MainWindow(const char* filename) :
-m_hexView(filename)
+MainWindow::MainWindow(File* file) :
+m_hexView(file)
 {
+	m_file = file;
     m_helpWindow.SetVisible(false);
-
-    GetFullPathName(filename, MAX_PATH, m_fullPath, &m_filename);
 
     // If full path is too long, just show the filename.
     if (strlen(m_fullPath) > MAX_FILENAME_SIZE)
     {
         // If filename is too long, truncate it.
-        int len = strlen(m_filename);
+		const char* fileName = file->GetFileName();
+        int len = strlen(fileName);
         if (len <= MAX_FILENAME_SIZE)
         {
-            strncpy_s(m_fullPath, MAX_PATH, m_filename, len);
+            strncpy_s(m_fullPath, MAX_PATH, fileName, len);
         }
         else
         {
             len = MAX_FILENAME_SIZE;
-            strncpy_s(m_fullPath, MAX_PATH, m_filename, len);
+            strncpy_s(m_fullPath, MAX_PATH, fileName, len);
             strcat_s(m_fullPath, MAX_PATH, "..");
         }
     }
@@ -35,6 +35,12 @@ void MainWindow::OnWindowRefreshed()
     s_consoleBuffer->Clear(Colours::Background);
     s_consoleBuffer->FillLine(0, ' ', Colours::StatusBar);
     s_consoleBuffer->Write(1, 0, Colours::StatusBar, m_fullPath);
+	if (m_file->IsReadOnly())
+	{
+		int readOnlyOffset = strlen(m_fullPath) + 2;
+		s_consoleBuffer->Write(readOnlyOffset, 0, Colours::StatusBar, "[RO]");
+	}
+
     s_consoleBuffer->FillLine(m_height - 1, ' ', Colours::StatusBar);
 
     int selectedOffset = m_hexView.GetSelectedOffset();

@@ -43,7 +43,9 @@ int main(int argc, char** argv)
 
     ConsoleBuffer buffer(stdoutHandle);
     Window::SetConsoleBuffer(&buffer);
-    MainWindow mainWindow(argv[1]);
+	File file;
+	file.Open(argv[1]);
+    MainWindow mainWindow(&file);
 
     s_running = true;
 

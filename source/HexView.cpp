@@ -6,26 +6,27 @@
 static const int BYTES_OFFSET = 11;
 static const int CHARS_OFFSET = BYTES_OFFSET + (16 * 3);
 
-HexView::HexView(const char* filename)
+HexView::HexView(File* file)
 {
 	m_editMode = EditMode_None;
     m_buffer = 0;
     m_topLine = 0;
     m_selected = 0;
     m_fileSize = 0;
-    m_file.Open(filename);
-    if (m_file.IsOpen())
-        m_fileSize = m_file.GetSize();
+	m_file = file;
+	assert(file);
+    if (m_file->IsOpen())
+        m_fileSize = m_file->GetSize();
 }
 
 HexView::~HexView()
 {
-    m_file.Close();
+    m_file->Close();
 }
 
 void HexView::OnWindowRefreshed()
 {
-    if (!m_file.IsOpen())
+    if (!m_file->IsOpen())
         return;
 
     assert(m_buffer);
@@ -117,7 +118,7 @@ void HexView::OnWindowResized(int width, int height)
 
 void HexView::CacheFile(bool resizeBuffer)
 {
-    if (!m_file.IsOpen())
+    if (!m_file->IsOpen())
         return;
 
     assert(m_topLine >= 0);
@@ -135,8 +136,8 @@ void HexView::CacheFile(bool resizeBuffer)
         memset(m_buffer, 0, m_bufferSize);
     }
 
-    m_file.Seek(offset);
-    m_file.Read(m_buffer, m_bufferSize);
+    m_file->Seek(offset);
+    m_file->Read(m_buffer, m_bufferSize);
 }
 
 void HexView::OnKeyEvent(KeyEvent& keyEvent)
@@ -392,7 +393,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 
 		case VK_INSERT:
 		{
-			if (m_editMode != EditMode_None || !m_file.IsOpen())
+			if (m_editMode != EditMode_None || !m_file->IsOpen())
 				break;
 
 			m_editMode = EditMode_Byte;
@@ -451,8 +452,8 @@ void HexView::WriteBytes(unsigned char ascii)
 	b = (b & ~mask) | (value << (4 * m_nibbleIndex));
 	m_buffer[bufferIndex] = b;
 
-	m_file.Seek(m_selected);
-	m_file.Write(m_buffer + bufferIndex, 1);
+	m_file->Seek(m_selected);
+	m_file->Write(m_buffer + bufferIndex, 1);
 }
 
 void HexView::WriteChar(unsigned char ascii)
@@ -461,6 +462,6 @@ void HexView::WriteChar(unsigned char ascii)
 	int bufferIndex = m_selected - (m_topLine << 4);
 	assert(bufferIndex >= 0 && bufferIndex < m_bufferSize);
 	m_buffer[bufferIndex] = ascii;
-	m_file.Seek(m_selected);
-	m_file.Write(m_buffer + bufferIndex, 1);
+	m_file->Seek(m_selected);
+	m_file->Write(m_buffer + bufferIndex, 1);
 }

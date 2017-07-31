@@ -6,7 +6,7 @@
 class HexView : public Window
 {
     public:
-        HexView(const char* filename);
+        HexView(File* file);
         ~HexView();
 
         virtual void OnWindowRefreshed();
@@ -26,12 +26,13 @@ class HexView : public Window
         int GetLastLine();
         int GetBottomLine();
 
-        File m_file;
         unsigned char* m_buffer;
         int m_bufferSize;
         int m_topLine;
         int m_selected;
         int m_fileSize;
+
+		File* m_file;
 
 		enum EditMode
 		{

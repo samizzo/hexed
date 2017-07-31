@@ -4,16 +4,37 @@
 
 File::File()
 {
-    m_path = 0;
+    m_filename = 0;
+	m_fullPath = 0;
     m_filesize = 0;
     m_handle = 0;
 }
 
+File::~File()
+{
+	delete[] m_fullPath;
+}
+
 bool File::Open(const char* path)
 {
-    m_path = path;
+	m_readOnly = false;
 
-    m_handle = CreateFile(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	m_fullPath = new char[MAX_PATH];
+	GetFullPathName(path, MAX_PATH, m_fullPath, &m_filename);
+
+	DWORD fileAttr = GetFileAttributes(path);
+	if (fileAttr != INVALID_FILE_ATTRIBUTES)
+		m_readOnly = (fileAttr & FILE_ATTRIBUTE_READONLY) != 0;
+
+	DWORD access = GENERIC_READ;
+	DWORD shareMode = FILE_SHARE_READ;
+	if (!m_readOnly)
+	{
+		access |= GENERIC_WRITE;
+		shareMode |= FILE_SHARE_DELETE | FILE_SHARE_WRITE;
+	}
+
+    m_handle = CreateFile(path, access, shareMode, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (m_handle != INVALID_HANDLE_VALUE)
         m_filesize = GetFileSize(m_handle, 0);
 
