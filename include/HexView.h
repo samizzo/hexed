@@ -34,14 +34,14 @@ class HexView : public Window
 
 		File* m_file;
 
-		enum EditMode
+		enum Mode
 		{
-			EditMode_None,
-			EditMode_Byte,
-			EditMode_Char
+			Mode_None,
+			Mode_EditByte,
+			Mode_EditChar
 		};
 
-		EditMode m_editMode;
+		Mode m_mode;
 		int m_nibbleIndex;
 };
 
