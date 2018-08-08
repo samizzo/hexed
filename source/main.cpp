@@ -14,26 +14,30 @@ void RemapColours(HANDLE stdoutHandle);
 
 int main(int argc, char** argv)
 {
-	char *fname = NULL;
+    char *fname = NULL;
     if (argc != 2)
     {
-		OPENFILENAME ofn;
-		ZeroMemory(&ofn, sizeof ofn);
-		ofn.lStructSize = sizeof ofn;
-		ofn.lpstrFilter = "All files\0*.*\0\0";
-		ofn.nFilterIndex = 1;
-		ofn.lpstrFile = fname = new char[MAX_PATH];
-		ofn.nMaxFile = MAX_PATH;
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_FORCESHOWHIDDEN;
+        OPENFILENAME ofn;
+        ZeroMemory(&ofn, sizeof ofn);
+        ofn.lStructSize = sizeof ofn;
+        ofn.lpstrFilter = "All files\0*.*\0\0";
+        ofn.nFilterIndex = 1;
+        ofn.lpstrFile = fname = new char[MAX_PATH];
+        ofn.nMaxFile = MAX_PATH;
+        ofn.Flags = OFN_FILEMUSTEXIST | OFN_FORCESHOWHIDDEN;
 
-		*fname = '\0';
-		if (GetOpenFileName(&ofn) == FALSE) {
-			printf("usage: hexed <filename>\n");
-			delete[] fname;
-			return 0;
-		}
-	} else
-		fname = argv[1];
+        *fname = '\0';
+        if (GetOpenFileName(&ofn) == FALSE)
+        {
+            printf("usage: hexed <filename>\n");
+            delete[] fname;
+            return 0;
+        }
+    }
+    else
+    {
+        fname = argv[1];
+    }
 
     HANDLE stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
     if (stdinHandle == INVALID_HANDLE_VALUE)
@@ -58,8 +62,8 @@ int main(int argc, char** argv)
 
     ConsoleBuffer buffer(stdoutHandle);
     Window::SetConsoleBuffer(&buffer);
-	File file;
-	file.Open(fname);
+    File file;
+    file.Open(fname);
     MainWindow mainWindow(&file);
 
     s_running = true;
@@ -96,8 +100,8 @@ int main(int argc, char** argv)
     }
 
     RestoreConsole(stdoutHandle, stdoutHandle);
-	if (fname != argv[1])
-		delete[] fname;
+    if (fname != argv[1])
+        delete[] fname;
 }
 
 void ProcessInput(const INPUT_RECORD& inputRecord)
