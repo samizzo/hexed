@@ -5,9 +5,11 @@ hexed - a Windows console-based hex editor
 ## Keyboard shortcuts
 * Navigation: **Left**, **Right**, **Up**, **Down**
 
-  **Home/End** to jump to the _start_/_end_ of current row
+  vi-style keybings (**i, j, k, l**) can also be used in view and byte editing modes.
+
+  **Home/End** to jump to the _start_/_end_ of current row, or the entire file if in combination with **Ctrl**
   
-  **PageUp**/**PageDown** skips to the _first_/_last_ row while maintaing column alignment
+  **PageUp**/**PageDown** advances or rewinds the view of the file a page at a time, or if in combination with **Ctrl**, the _first_/_last_ row of the currently displayed page. Column alignment is preserved
 * Redraw display: **F5**
 * Enter/Exit edit mode: **Insert/Escape**, goes into _byte_ (Hex) editing mode by default
 * Switch between edit modes: **Tab**, currently two modes are supported, _byte_ (Hex) and _char_ (ASCII)
