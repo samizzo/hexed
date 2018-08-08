@@ -190,6 +190,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
     switch (vkCode)
     {
         case VK_LEFT:
+        case 'H':
         {
 			if (m_editMode == EditMode_Byte && m_nibbleIndex == 0)
 			{
@@ -213,6 +214,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
         }
 
         case VK_RIGHT:
+        case 'L':
         {
 			if (m_editMode == EditMode_Byte && m_nibbleIndex == 1)
 			{
@@ -236,6 +238,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
         }
 
         case VK_UP:
+        case 'K':
         {
             refresh = false;
             int selectedLine = GetSelectedLine();
@@ -256,6 +259,7 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
         }
 
         case VK_DOWN:
+        case 'J':
         {
             refresh = false;
             int selectedLine = GetSelectedLine();
