@@ -38,7 +38,8 @@ class HexView : public Window
 		{
 			Mode_None,
 			Mode_EditByte,
-			Mode_EditChar
+			Mode_EditChar,
+			Mode_Find
 		};
 
 		Mode m_mode;

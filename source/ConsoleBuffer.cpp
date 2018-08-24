@@ -231,3 +231,11 @@ void ConsoleBuffer::SetCursor(bool visible, unsigned int size)
 	info.dwSize = size;
 	SetConsoleCursorInfo(m_stdoutHandle, &info);
 }
+
+void ConsoleBuffer::SetCursorPosition(int x, int y)
+{
+	COORD pos;
+	pos.X = x;
+	pos.Y = y;
+	SetConsoleCursorPosition(m_stdoutHandle, pos);
+}

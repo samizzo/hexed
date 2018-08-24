@@ -163,44 +163,105 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 		return;
 	}
 
-    bool refresh = true;
-    bool fullDraw = false;
+	bool refresh = true;
+	bool fullDraw = false;
 
 	unsigned short vkCode = keyEvent.GetVKKeyCode();
 
-	if (m_mode == Mode_EditByte)
-	{
-		unsigned char ascii = toupper(keyEvent.GetAscii());
-		if ((ascii >= 'A' && ascii <= 'F') || (ascii >= '0' && ascii <= '9'))
-		{
-			WriteBytes(ascii);
-			vkCode = VK_RIGHT;
-		}
-	}
-	else if (m_mode == Mode_EditChar)
+	if (m_mode == Mode_None)
 	{
 		unsigned char ascii = keyEvent.GetAscii();
-		if (ascii >= 32 && ascii < 127)
+		if (ascii == '/' || (tolower(ascii) == 'f' && keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)))
 		{
-			WriteChar((unsigned char)ascii);
-			vkCode = VK_RIGHT;
+			// Forward slash or ctrl-f switch to find mode.
+			m_mode = Mode_Find;
 		}
 	}
 
-    switch (vkCode)
-    {
-        case VK_LEFT:
-        {
-			if (m_mode == Mode_EditByte && m_nibbleIndex == 0)
+	if (m_mode == Mode_Find)
+	{
+		s_consoleBuffer->SetCursor(true, 100);
+		s_consoleBuffer->SetCursorPosition(1, m_height + 1);
+	}
+	else
+	{
+		if (m_mode == Mode_EditByte)
+		{
+			unsigned char ascii = toupper(keyEvent.GetAscii());
+			if ((ascii >= 'A' && ascii <= 'F') || (ascii >= '0' && ascii <= '9'))
 			{
-				// In byte edit mode
-				m_nibbleIndex = 1;
+				WriteBytes(ascii);
+				vkCode = VK_RIGHT;
 			}
-			else
+		}
+		else if (m_mode == Mode_EditChar)
+		{
+			unsigned char ascii = keyEvent.GetAscii();
+			if (ascii >= 32 && ascii < 127)
 			{
-				m_nibbleIndex = 0;
-				m_selected = max(m_selected - 1, 0);
+				WriteChar((unsigned char)ascii);
+				vkCode = VK_RIGHT;
+			}
+		}
+
+		switch (vkCode)
+		{
+			case VK_LEFT:
+			{
+				if (m_mode == Mode_EditByte && m_nibbleIndex == 0)
+				{
+					// In byte edit mode
+					m_nibbleIndex = 1;
+				}
+				else
+				{
+					m_nibbleIndex = 0;
+					m_selected = max(m_selected - 1, 0);
+					int selectedLine = GetSelectedLine();
+					if (selectedLine < m_topLine)
+					{
+						m_topLine--;
+						assert(m_topLine >= 0);
+						fullDraw = true;
+						CacheFile();
+					}
+				}
+				break;
+			}
+
+			case VK_RIGHT:
+			{
+				if (m_mode == Mode_EditByte && m_nibbleIndex == 1)
+				{
+					m_nibbleIndex = 0;
+				}
+				else
+				{
+					m_nibbleIndex = 1;
+					m_selected = max(min(m_selected + 1, m_fileSize - 1), 0);
+					int selectedLine = GetSelectedLine();
+					int bottomLine = GetBottomLine();
+					if (selectedLine > bottomLine)
+					{
+						m_topLine++;
+						assert((m_topLine << 4) < m_fileSize);
+						fullDraw = true;
+						CacheFile();
+					}
+				}
+				break;
+			}
+
+			case VK_UP:
+			{
+				refresh = false;
 				int selectedLine = GetSelectedLine();
+				if (selectedLine == 0)
+					break;
+
+				refresh = true;
+				m_selected = max(m_selected - 16, 0);
+				selectedLine = GetSelectedLine();
 				if (selectedLine < m_topLine)
 				{
 					m_topLine--;
@@ -208,21 +269,23 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 					fullDraw = true;
 					CacheFile();
 				}
+				break;
 			}
-            break;
-        }
 
-        case VK_RIGHT:
-        {
-			if (m_mode == Mode_EditByte && m_nibbleIndex == 1)
+			case VK_DOWN:
 			{
-				m_nibbleIndex = 0;
-			}
-			else
-			{
-				m_nibbleIndex = 1;
-				m_selected = max(min(m_selected + 1, m_fileSize - 1), 0);
+				refresh = false;
 				int selectedLine = GetSelectedLine();
+				int lastLine = GetLastLine();
+
+				// If on the last line, don't move anywhere.
+				if (selectedLine == lastLine)
+					break;
+
+				refresh = true;
+				m_selected = max(min(m_selected + 16, m_fileSize - 1), 0);
+				selectedLine = GetSelectedLine();
+
 				int bottomLine = GetBottomLine();
 				if (selectedLine > bottomLine)
 				{
@@ -231,186 +294,141 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 					fullDraw = true;
 					CacheFile();
 				}
+				break;
 			}
-            break;
-        }
 
-        case VK_UP:
-        {
-            refresh = false;
-            int selectedLine = GetSelectedLine();
-            if (selectedLine == 0)
-                break;
-
-            refresh = true;
-            m_selected = max(m_selected - 16, 0);
-            selectedLine = GetSelectedLine();
-            if (selectedLine < m_topLine)
-            {
-                m_topLine--;
-                assert(m_topLine >= 0);
-                fullDraw = true;
-                CacheFile();
-            }
-            break;
-        }
-
-        case VK_DOWN:
-        {
-            refresh = false;
-            int selectedLine = GetSelectedLine();
-            int lastLine = GetLastLine();
-
-            // If on the last line, don't move anywhere.
-            if (selectedLine == lastLine)
-                break;
-
-            refresh = true;
-            m_selected = max(min(m_selected + 16, m_fileSize - 1), 0);
-            selectedLine = GetSelectedLine();
-
-            int bottomLine = GetBottomLine();
-            if (selectedLine > bottomLine)
-            {
-                m_topLine++;
-                assert((m_topLine << 4) < m_fileSize);
-                fullDraw = true;
-                CacheFile();
-            }
-            break;
-        }
-
-        case VK_HOME:
-        {
-            if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
-            {
-                m_selected = 0;
-                m_topLine = 0;
-                fullDraw = true;
-                CacheFile();
-            }
-            else
-            {
-                m_selected &= ~15;
-            }
-            break;
-        }
-
-        case VK_END:
-        {
-            if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
-            {
-                m_selected = max(m_fileSize - 1, 0);
-                int selectedLine = GetSelectedLine();
-                m_topLine = max(selectedLine - m_height + 1, 0);
-                fullDraw = true;
-                CacheFile();
-            }
-            else
-            {
-                m_selected = max(min(m_selected | 15, m_fileSize - 1), 0);
-            }
-            break;
-        }
-
-        // Page down.
-        case VK_NEXT:
-        {
-            // Current selection column in the last line.
-            int lastLineSelected = max(min(((m_fileSize - 1) & ~0xf) | (m_selected & 0xf), m_fileSize - 1), 0);
-
-            if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
-            {
-                // Control is down. Go to the bottom of the current page.
-                int bottomLine = GetBottomLine();
-
-                // Select the offset at the bottom of the current page.
-                m_selected = min((bottomLine << 4) | (m_selected & 0xf), lastLineSelected);
-            }
-            else
-            {
-                int selectedLine = GetSelectedLine();
-
-                // Get the current distance from the selection to the top line.
-                int delta = selectedLine - m_topLine;
-
-                // Select the offset at one page down from the current.
-                m_selected = min(m_selected + (m_height << 4), lastLineSelected);
-
-                // Determine if we need to update the top line.
-                selectedLine = GetSelectedLine();
-                int bottomLine = GetBottomLine();
-                if (selectedLine > bottomLine)
-                {
-                    // Update the top line, but maintain the current selection distance so the cursor
-                    // never moves.
-                    m_topLine = max(selectedLine - delta, 0);
-                    fullDraw = true;
-                    CacheFile();
-                }
-            }
-            break;
-        }
-
-        // Page up.
-        case VK_PRIOR:
-        {
-            if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
-            {
-                // Control is down. Go to the top of the current page.
-                // Select the offset at the top of the current page.
-                m_selected = (m_topLine << 4) | m_selected & 0xf;
-            }
-            else
-            {
-                int selectedLine = GetSelectedLine();
-
-                // Get the current distance from the selection to the top line.
-                int delta = selectedLine - m_topLine;
-
-                // Select the offset at one page up from the current.
-                m_selected = max(m_selected - (m_height << 4), (m_selected & 0xf));
-
-                // Determine if we need to update the top line.
-                selectedLine = GetSelectedLine();
-                if (selectedLine < m_topLine)
-                {
-                    // Update the top line, but maintain the current selection distance so the cursor
-                    // never moves.
-                    m_topLine = max(selectedLine - delta, 0);
-                    fullDraw = true;
-                    CacheFile();
-                }
-            }
-            break;
-        }
-
-        case VK_F5:
-        {
-            fullDraw = true;
-            break;
-        }
-
-		case VK_INSERT:
-		{
-			if (m_mode != Mode_None || !m_file->IsOpen())
+			case VK_HOME:
+			{
+				if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+				{
+					m_selected = 0;
+					m_topLine = 0;
+					fullDraw = true;
+					CacheFile();
+				}
+				else
+				{
+					m_selected &= ~15;
+				}
 				break;
+			}
 
-			m_mode = Mode_EditByte;
-			m_nibbleIndex = 1;
-			s_consoleBuffer->SetCursor(true, 100);
-			break;
-		}
-
-		case VK_TAB:
-		{
-			if (m_mode == Mode_None)
+			case VK_END:
+			{
+				if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+				{
+					m_selected = max(m_fileSize - 1, 0);
+					int selectedLine = GetSelectedLine();
+					m_topLine = max(selectedLine - m_height + 1, 0);
+					fullDraw = true;
+					CacheFile();
+				}
+				else
+				{
+					m_selected = max(min(m_selected | 15, m_fileSize - 1), 0);
+				}
 				break;
+			}
 
-			m_mode = m_mode == Mode_EditByte ? Mode_EditChar : Mode_EditByte;
-			break;
+			// Page down.
+			case VK_NEXT:
+			{
+				// Current selection column in the last line.
+				int lastLineSelected = max(min(((m_fileSize - 1) & ~0xf) | (m_selected & 0xf), m_fileSize - 1), 0);
+
+				if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+				{
+					// Control is down. Go to the bottom of the current page.
+					int bottomLine = GetBottomLine();
+
+					// Select the offset at the bottom of the current page.
+					m_selected = min((bottomLine << 4) | (m_selected & 0xf), lastLineSelected);
+				}
+				else
+				{
+					int selectedLine = GetSelectedLine();
+
+					// Get the current distance from the selection to the top line.
+					int delta = selectedLine - m_topLine;
+
+					// Select the offset at one page down from the current.
+					m_selected = min(m_selected + (m_height << 4), lastLineSelected);
+
+					// Determine if we need to update the top line.
+					selectedLine = GetSelectedLine();
+					int bottomLine = GetBottomLine();
+					if (selectedLine > bottomLine)
+					{
+						// Update the top line, but maintain the current selection distance so the cursor
+						// never moves.
+						m_topLine = max(selectedLine - delta, 0);
+						fullDraw = true;
+						CacheFile();
+					}
+				}
+				break;
+			}
+
+			// Page up.
+			case VK_PRIOR:
+			{
+				if (keyEvent.IsControlKeyDown(LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+				{
+					// Control is down. Go to the top of the current page.
+					// Select the offset at the top of the current page.
+					m_selected = (m_topLine << 4) | m_selected & 0xf;
+				}
+				else
+				{
+					int selectedLine = GetSelectedLine();
+
+					// Get the current distance from the selection to the top line.
+					int delta = selectedLine - m_topLine;
+
+					// Select the offset at one page up from the current.
+					m_selected = max(m_selected - (m_height << 4), (m_selected & 0xf));
+
+					// Determine if we need to update the top line.
+					selectedLine = GetSelectedLine();
+					if (selectedLine < m_topLine)
+					{
+						// Update the top line, but maintain the current selection distance so the cursor
+						// never moves.
+						m_topLine = max(selectedLine - delta, 0);
+						fullDraw = true;
+						CacheFile();
+					}
+				}
+				break;
+			}
+
+			case VK_F5:
+			{
+				fullDraw = true;
+				break;
+			}
+
+			case VK_INSERT:
+			{
+				if (m_mode != Mode_None || !m_file->IsOpen())
+					break;
+
+				m_mode = Mode_EditByte;
+				m_nibbleIndex = 1;
+				s_consoleBuffer->SetCursor(true, 100);
+				break;
+			}
+
+			case VK_TAB:
+			{
+				if (m_mode == Mode_None)
+					break;
+
+				m_mode = m_mode == Mode_EditByte ? Mode_EditChar : Mode_EditByte;
+				break;
+			}
 		}
-    }
+	}
 
 	if (refresh)
 	{
@@ -421,23 +439,23 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
 
 void HexView::UpdateCursor()
 {
-	if (m_mode == Mode_None)
+	if (m_mode != Mode_EditByte && m_mode != Mode_EditChar)
 		return;
 
 	HANDLE stdoutHandle = s_consoleBuffer->GetStdoutHandle();
-	COORD cursorPos;
+	int x, y;
 
 	if (m_mode == Mode_EditByte)
 	{
-		cursorPos.X = BYTES_OFFSET + ((m_selected & 0xf) * 3) + (m_nibbleIndex ^ 1);
+		x = BYTES_OFFSET + ((m_selected & 0xf) * 3) + (m_nibbleIndex ^ 1);
 	}
 	else
 	{
-		cursorPos.X = CHARS_OFFSET + (m_selected & 0xf);
+		x = CHARS_OFFSET + (m_selected & 0xf);
 	}
 
-	cursorPos.Y = (GetSelectedLine() - m_topLine) + 1;
-	SetConsoleCursorPosition(stdoutHandle, cursorPos);
+	y = (GetSelectedLine() - m_topLine) + 1;
+	s_consoleBuffer->SetCursorPosition(x, y);
 }
 
 void HexView::WriteBytes(unsigned char ascii)

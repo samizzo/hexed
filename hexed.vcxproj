@@ -24,6 +24,7 @@
     <ClCompile Include="Source\File.cpp" />
     <ClCompile Include="source\HelpWindow.cpp" />
     <ClCompile Include="source\HexView.cpp" />
+    <ClCompile Include="source\InputField.cpp" />
     <ClCompile Include="source\Log.cpp" />
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\MainWindow.cpp" />
@@ -38,6 +39,7 @@
     <ClInclude Include="include\File.h" />
     <ClInclude Include="include\HelpWindow.h" />
     <ClInclude Include="include\HexView.h" />
+    <ClInclude Include="include\InputField.h" />
     <ClInclude Include="include\KeyEvent.h" />
     <ClInclude Include="include\Log.h" />
     <ClInclude Include="include\MainWindow.h" />

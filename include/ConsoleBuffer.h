@@ -19,6 +19,7 @@ class ConsoleBuffer
         void Flush(bool fullDraw);
 
 		void SetCursor(bool visible, unsigned int size);
+		void SetCursorPosition(int x, int y);
 
         int GetWidth() const;
         int GetHeight() const;
