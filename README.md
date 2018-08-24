@@ -10,9 +10,13 @@ hexed - a Windows console-based hex editor
 
 * **h/l/k/j** - Vi-style equivalent of the above
 
-* **Home/End** - Jump to start/end of current row, or entire file if in combination with **Ctrl**
+* **Home/End** - Jump to start/end of current row
 
-* **Page Up/Page Down** - Advance or rewind view of file a page at a time. In combination with **Ctrl**, skip to first/last row of the currently displayed page. Current column is maintained
+* **Ctrl** + **Home/End** - Jump to start/end of entire file
+
+* **Page Up/Page Down** - Go back or forward a page at a time
+
+* **Ctrl** + **Page Up/Page Down** - Skip to first/last row of the currently displayed page while maintaining current column
 
 #### Editing
 
