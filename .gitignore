@@ -1,7 +1,6 @@
 .vs/*
 .DS_Store
-Debug/*
-Release/*
+Win32/*
 x64/*
 *.vtcache
 *.user
