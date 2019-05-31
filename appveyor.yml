@@ -7,7 +7,7 @@ platform:
   - x64
 build:
   project: hexed.sln
-  verbosity: minimal
+  verbosity: detailed
 artifacts:
   - path: $(PLATFORM)\$(CONFIGURATION)\hexed.exe
     name: hexed-deploy
