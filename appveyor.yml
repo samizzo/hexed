@@ -1,6 +1,4 @@
 version: 1.0.{build}
-os:
-  - Visual Studio 2015
 configuration:
   - Debug
   - Release
@@ -12,4 +10,4 @@ build:
   verbosity: minimal
 artifacts:
   - path: $(PLATFORM)\$(CONFIGURATION)\hexed.exe
-name: hexed-deploy
+  name: hexed-deploy
