@@ -1,13 +1,15 @@
 version: 1.0.{build}
+os:
+  - Visual Studio 2015
 configuration:
-- Debug
-- Release
+  - Debug
+  - Release
 platform:
-- Win32
-- x64
+  - Win32
+  - x64
 build:
   project: hexed.sln
   verbosity: minimal
 artifacts:
-- path: $(PLATFORM)\$(CONFIGURATION)\hexed.exe
-  name: hexed-deploy
+  - path: $(PLATFORM)\$(CONFIGURATION)\hexed.exe
+name: hexed-deploy
