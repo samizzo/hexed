@@ -1,6 +1,6 @@
 .vs/*
 .DS_Store
-Win32/*
+x86/*
 x64/*
 *.vtcache
 *.user

@@ -3,11 +3,11 @@ configuration:
   - Debug
   - Release
 platform:
-  - Win32
+  - x86
   - x64
 build:
   project: hexed.sln
-  verbosity: detailed
+  verbosity: minimal
 artifacts:
   - path: $(PLATFORM)\$(CONFIGURATION)\hexed.exe
     name: hexed-deploy
