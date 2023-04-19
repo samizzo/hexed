@@ -16,5 +16,5 @@ class MainWindow : public Window
         char m_filename[MAX_PATH];
         HexView m_hexView;
         HelpWindow m_helpWindow;
-		File* m_file;
+        File* m_file;
 };

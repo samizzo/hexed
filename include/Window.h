@@ -8,10 +8,10 @@
 class Window
 {
     public:
-		Window();
+        Window();
 
         virtual void OnWindowRefreshed() = 0;
-		virtual void OnWindowResized(int width, int height);
+        virtual void OnWindowResized(int width, int height);
         virtual void OnKeyEvent(KeyEvent& keyEvent) = 0;
 
         void SetVisible(bool visible);
@@ -32,7 +32,7 @@ class Window
     private:
         enum Flags
         {
-           Flags_Visible = 1 << 0
+            Flags_Visible = 1 << 0
         };
 
         unsigned int m_flags;

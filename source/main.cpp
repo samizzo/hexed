@@ -14,7 +14,7 @@ void RemapColours(HANDLE stdoutHandle);
 
 int main(int argc, char** argv)
 {
-    char *fname = NULL;
+    char* fname = NULL;
     if (argc != 2)
     {
         OPENFILENAME ofn;

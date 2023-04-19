@@ -5,34 +5,34 @@
 File::File()
 {
     m_filename = 0;
-	m_fullPath = 0;
+    m_fullPath = 0;
     m_filesize = 0;
     m_handle = 0;
 }
 
 File::~File()
 {
-	delete[] m_fullPath;
+    delete[] m_fullPath;
 }
 
 bool File::Open(const char* path)
 {
-	m_readOnly = false;
+    m_readOnly = false;
 
-	m_fullPath = new char[MAX_PATH];
-	GetFullPathName(path, MAX_PATH, m_fullPath, &m_filename);
+    m_fullPath = new char[MAX_PATH];
+    GetFullPathName(path, MAX_PATH, m_fullPath, &m_filename);
 
-	DWORD fileAttr = GetFileAttributes(path);
-	if (fileAttr != INVALID_FILE_ATTRIBUTES)
-		m_readOnly = (fileAttr & FILE_ATTRIBUTE_READONLY) != 0;
+    DWORD fileAttr = GetFileAttributes(path);
+    if (fileAttr != INVALID_FILE_ATTRIBUTES)
+        m_readOnly = (fileAttr & FILE_ATTRIBUTE_READONLY) != 0;
 
-	DWORD access = GENERIC_READ;
-	DWORD shareMode = FILE_SHARE_READ;
-	if (!m_readOnly)
-	{
-		access |= GENERIC_WRITE;
-		shareMode |= FILE_SHARE_DELETE | FILE_SHARE_WRITE;
-	}
+    DWORD access = GENERIC_READ;
+    DWORD shareMode = FILE_SHARE_READ;
+    if (!m_readOnly)
+    {
+        access |= GENERIC_WRITE;
+        shareMode |= FILE_SHARE_DELETE | FILE_SHARE_WRITE;
+    }
 
     m_handle = CreateFile(path, access, shareMode, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (m_handle != INVALID_HANDLE_VALUE)
@@ -43,7 +43,7 @@ bool File::Open(const char* path)
 
 bool File::IsOpen() const
 {
-	return m_handle != INVALID_HANDLE_VALUE;
+    return m_handle != INVALID_HANDLE_VALUE;
 }
 
 void File::Close()
@@ -61,8 +61,8 @@ void File::Seek(unsigned int position)
 
     LARGE_INTEGER distance;
     distance.QuadPart = position;
-	if (!SetFilePointerEx(m_handle, distance, 0, FILE_BEGIN))
-		Error("SetFilePointerEx failed");
+    if (!SetFilePointerEx(m_handle, distance, 0, FILE_BEGIN))
+        Error("SetFilePointerEx failed");
 }
 
 void File::Read(void* buffer, unsigned int size)
@@ -76,10 +76,10 @@ void File::Read(void* buffer, unsigned int size)
 
 void File::Write(void* buffer, unsigned int size)
 {
-	if (!m_handle)
-		return;
+    if (!m_handle)
+        return;
 
-	DWORD bytesWritten;
-	if (!WriteFile(m_handle, buffer, size, &bytesWritten, 0))
-		Error("WriteFile failed");
+    DWORD bytesWritten;
+    if (!WriteFile(m_handle, buffer, size, &bytesWritten, 0))
+        Error("WriteFile failed");
 }

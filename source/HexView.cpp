@@ -8,13 +8,13 @@ static const int CHARS_OFFSET = BYTES_OFFSET + (16 * 3);
 
 HexView::HexView(File* file)
 {
-	m_editMode = EditMode_None;
+    m_editMode = EditMode_None;
     m_buffer = 0;
     m_topLine = 0;
     m_selected = 0;
     m_fileSize = 0;
-	m_file = file;
-	assert(file);
+    m_file = file;
+    assert(file);
     if (m_file->IsOpen())
         m_fileSize = m_file->GetSize();
 }
@@ -39,8 +39,8 @@ void HexView::OnWindowRefreshed()
         int y = 1 + j;
         WORD colour = 0;
 
-		int lastLine = (m_fileSize - 1) >> 4;
-		int curr = lastLine == 0 ? 0 : GetSelectedLine() * (m_height - 1) / lastLine;
+        int lastLine = (m_fileSize - 1) >> 4;
+        int curr = lastLine == 0 ? 0 : GetSelectedLine() * (m_height - 1) / lastLine;
         char c = j == curr ? 178 : 176;
         s_consoleBuffer->Write(0, y, Colours::Scrollbar, "%c", c);
 
@@ -50,11 +50,11 @@ void HexView::OnWindowRefreshed()
         if ((offset >> 4) == selectedLine)
         {
             // Highlight the selected line's offset text.
-			colour = Colours::HexViewHighlight;
+            colour = Colours::HexViewHighlight;
         }
         else
         {
-			colour = Colours::HexViewOffsetNormal;
+            colour = Colours::HexViewOffsetNormal;
         }
 
         s_consoleBuffer->Write(2, y, colour, "%08X", offset);
@@ -70,13 +70,13 @@ void HexView::OnWindowRefreshed()
             if (offset == m_selected && (m_editMode == EditMode_None || m_editMode == EditMode_Char))
             {
                 // Highlight the selected byte but only if not in edit mode,
-				// or if we are in edit mode, then only if we are not editing
-				// the bytes.
-				colour = Colours::HexViewHighlight;
+                // or if we are in edit mode, then only if we are not editing
+                // the bytes.
+                colour = Colours::HexViewHighlight;
             }
             else
             {
-				colour = Colours::HexViewByteNormal;
+                colour = Colours::HexViewByteNormal;
             }
 
             int xx = x + (i * 3);
@@ -89,21 +89,21 @@ void HexView::OnWindowRefreshed()
             if (offset == m_selected && (m_editMode == EditMode_None || m_editMode == EditMode_Byte))
             {
                 // Highlight the selected character but only if not in edit mode,
-				// or if we are in edit mode, then only if we are not editing the
-				// bytes.
-				colour = Colours::HexViewHighlight;
+                // or if we are in edit mode, then only if we are not editing the
+                // bytes.
+                colour = Colours::HexViewHighlight;
             }
             else
             {
-				colour = Colours::HexViewCharNormal;
+                colour = Colours::HexViewCharNormal;
             }
             s_consoleBuffer->Write(xx, y, colour, "%c", c);
 
-			if ((offset + 1) >= m_fileSize)
-			{
-				done = true;
-				break;
-			}
+            if ((offset + 1) >= m_fileSize)
+            {
+                done = true;
+                break;
+            }
         }
     }
 }
@@ -142,98 +142,98 @@ void HexView::CacheFile(bool resizeBuffer)
 
 void HexView::OnKeyEvent(KeyEvent& keyEvent)
 {
-	if (!keyEvent.IsKeyDown())
-	{
-		switch (keyEvent.GetVKKeyCode())
-		{
-			case VK_ESCAPE:
-			{
-				if (m_editMode == EditMode_None)
-					break;
+    if (!keyEvent.IsKeyDown())
+    {
+        switch (keyEvent.GetVKKeyCode())
+        {
+            case VK_ESCAPE:
+            {
+                if (m_editMode == EditMode_None)
+                    break;
 
-				// Escape when in edit mode cancels the edit mode.
-				keyEvent.SetHandled();
-				m_editMode = EditMode_None;
-				s_consoleBuffer->SetCursor(false, 1);
-				Window::Refresh(true);
-				break;
-			}
-		}
+                // Escape when in edit mode cancels the edit mode.
+                keyEvent.SetHandled();
+                m_editMode = EditMode_None;
+                s_consoleBuffer->SetCursor(false, 1);
+                Window::Refresh(true);
+                break;
+            }
+        }
 
-		return;
-	}
+        return;
+    }
 
     bool refresh = true;
     bool fullDraw = false;
 
-	unsigned short vkCode = keyEvent.GetVKKeyCode();
+    unsigned short vkCode = keyEvent.GetVKKeyCode();
 
-	if (m_editMode == EditMode_Byte)
-	{
-		unsigned char ascii = toupper(keyEvent.GetAscii());
-		if ((ascii >= 'A' && ascii <= 'F') || (ascii >= '0' && ascii <= '9'))
-		{
-			WriteBytes(ascii);
-			vkCode = VK_RIGHT;
-		}
-	}
-	else if (m_editMode == EditMode_Char)
-	{
-		unsigned char ascii = keyEvent.GetAscii();
-		if (ascii >= 32 && ascii < 127)
-		{
-			WriteChar((unsigned char)ascii);
-			vkCode = VK_RIGHT;
-		}
-	}
+    if (m_editMode == EditMode_Byte)
+    {
+        unsigned char ascii = toupper(keyEvent.GetAscii());
+        if ((ascii >= 'A' && ascii <= 'F') || (ascii >= '0' && ascii <= '9'))
+        {
+            WriteBytes(ascii);
+            vkCode = VK_RIGHT;
+        }
+    }
+    else if (m_editMode == EditMode_Char)
+    {
+        unsigned char ascii = keyEvent.GetAscii();
+        if (ascii >= 32 && ascii < 127)
+        {
+            WriteChar((unsigned char)ascii);
+            vkCode = VK_RIGHT;
+        }
+    }
 
     switch (vkCode)
     {
         case VK_LEFT:
         case 'H':
         {
-			if (m_editMode == EditMode_Byte && m_nibbleIndex == 0)
-			{
-				// In byte edit mode
-				m_nibbleIndex = 1;
-			}
-			else
-			{
-				m_nibbleIndex = 0;
-				m_selected = max(m_selected - 1, 0);
-				int selectedLine = GetSelectedLine();
-				if (selectedLine < m_topLine)
-				{
-					m_topLine--;
-					assert(m_topLine >= 0);
-					fullDraw = true;
-					CacheFile();
-				}
-			}
+            if (m_editMode == EditMode_Byte && m_nibbleIndex == 0)
+            {
+                // In byte edit mode
+                m_nibbleIndex = 1;
+            }
+            else
+            {
+                m_nibbleIndex = 0;
+                m_selected = max(m_selected - 1, 0);
+                int selectedLine = GetSelectedLine();
+                if (selectedLine < m_topLine)
+                {
+                    m_topLine--;
+                    assert(m_topLine >= 0);
+                    fullDraw = true;
+                    CacheFile();
+                }
+            }
             break;
         }
 
         case VK_RIGHT:
         case 'L':
         {
-			if (m_editMode == EditMode_Byte && m_nibbleIndex == 1)
-			{
-				m_nibbleIndex = 0;
-			}
-			else
-			{
-				m_nibbleIndex = 1;
-				m_selected = max(min(m_selected + 1, m_fileSize - 1), 0);
-				int selectedLine = GetSelectedLine();
-				int bottomLine = GetBottomLine();
-				if (selectedLine > bottomLine)
-				{
-					m_topLine++;
-					assert((m_topLine << 4) < m_fileSize);
-					fullDraw = true;
-					CacheFile();
-				}
-			}
+            if (m_editMode == EditMode_Byte && m_nibbleIndex == 1)
+            {
+                m_nibbleIndex = 0;
+            }
+            else
+            {
+                m_nibbleIndex = 1;
+                m_selected = max(min(m_selected + 1, m_fileSize - 1), 0);
+                int selectedLine = GetSelectedLine();
+                int bottomLine = GetBottomLine();
+                if (selectedLine > bottomLine)
+                {
+                    m_topLine++;
+                    assert((m_topLine << 4) < m_fileSize);
+                    fullDraw = true;
+                    CacheFile();
+                }
+            }
             break;
         }
 
@@ -395,77 +395,77 @@ void HexView::OnKeyEvent(KeyEvent& keyEvent)
             break;
         }
 
-		case VK_INSERT:
-		{
-			if (m_editMode != EditMode_None || !m_file->IsOpen())
-				break;
+        case VK_INSERT:
+        {
+            if (m_editMode != EditMode_None || !m_file->IsOpen())
+                break;
 
-			m_editMode = EditMode_Byte;
-			m_nibbleIndex = 1;
-			s_consoleBuffer->SetCursor(true, 100);
-			break;
-		}
+            m_editMode = EditMode_Byte;
+            m_nibbleIndex = 1;
+            s_consoleBuffer->SetCursor(true, 100);
+            break;
+        }
 
-		case VK_TAB:
-		{
-			if (m_editMode == EditMode_None)
-				break;
+        case VK_TAB:
+        {
+            if (m_editMode == EditMode_None)
+                break;
 
-			m_editMode = m_editMode == EditMode_Byte ? EditMode_Char : EditMode_Byte;
-			break;
-		}
+            m_editMode = m_editMode == EditMode_Byte ? EditMode_Char : EditMode_Byte;
+            break;
+        }
     }
 
-	if (refresh)
-	{
-		Window::Refresh(fullDraw);
-		UpdateCursor();
-	}
+    if (refresh)
+    {
+        Window::Refresh(fullDraw);
+        UpdateCursor();
+    }
 }
 
 void HexView::UpdateCursor()
 {
-	if (m_editMode == EditMode_None)
-		return;
+    if (m_editMode == EditMode_None)
+        return;
 
-	HANDLE stdoutHandle = s_consoleBuffer->GetStdoutHandle();
-	COORD cursorPos;
+    HANDLE stdoutHandle = s_consoleBuffer->GetStdoutHandle();
+    COORD cursorPos;
 
-	if (m_editMode == EditMode_Byte)
-	{
-		cursorPos.X = BYTES_OFFSET + ((m_selected & 0xf) * 3) + (m_nibbleIndex ^ 1);
-	}
-	else
-	{
-		cursorPos.X = CHARS_OFFSET + (m_selected & 0xf);
-	}
+    if (m_editMode == EditMode_Byte)
+    {
+        cursorPos.X = BYTES_OFFSET + ((m_selected & 0xf) * 3) + (m_nibbleIndex ^ 1);
+    }
+    else
+    {
+        cursorPos.X = CHARS_OFFSET + (m_selected & 0xf);
+    }
 
-	cursorPos.Y = (GetSelectedLine() - m_topLine) + 1;
-	SetConsoleCursorPosition(stdoutHandle, cursorPos);
+    cursorPos.Y = (GetSelectedLine() - m_topLine) + 1;
+    SetConsoleCursorPosition(stdoutHandle, cursorPos);
 }
 
 void HexView::WriteBytes(unsigned char ascii)
 {
-	// Write bytes to the buffer.
-	int bufferIndex = m_selected - (m_topLine << 4);
-	assert(bufferIndex >= 0 && bufferIndex < m_bufferSize);
+    // Write bytes to the buffer.
+    int bufferIndex = m_selected - (m_topLine << 4);
+    assert(bufferIndex >= 0 && bufferIndex < m_bufferSize);
 
-	char value = (ascii >= 'A' && ascii <= 'F') ? ascii - 'A' + 10 : ascii - '0';
-	unsigned char b = m_buffer[bufferIndex];
-	unsigned char mask = 0xf << (4 * m_nibbleIndex);
-	b = (b & ~mask) | (value << (4 * m_nibbleIndex));
-	m_buffer[bufferIndex] = b;
+    char value = (ascii >= 'A' && ascii <= 'F') ? ascii - 'A' + 10 : ascii - '0';
+    unsigned char b = m_buffer[bufferIndex];
+    unsigned char mask = 0xf << (4 * m_nibbleIndex);
+    b = (b & ~mask) | (value << (4 * m_nibbleIndex));
+    m_buffer[bufferIndex] = b;
 
-	m_file->Seek(m_selected);
-	m_file->Write(m_buffer + bufferIndex, 1);
+    m_file->Seek(m_selected);
+    m_file->Write(m_buffer + bufferIndex, 1);
 }
 
 void HexView::WriteChar(unsigned char ascii)
 {
-	// Write chars to the buffer.
-	int bufferIndex = m_selected - (m_topLine << 4);
-	assert(bufferIndex >= 0 && bufferIndex < m_bufferSize);
-	m_buffer[bufferIndex] = ascii;
-	m_file->Seek(m_selected);
-	m_file->Write(m_buffer + bufferIndex, 1);
+    // Write chars to the buffer.
+    int bufferIndex = m_selected - (m_topLine << 4);
+    assert(bufferIndex >= 0 && bufferIndex < m_bufferSize);
+    m_buffer[bufferIndex] = ascii;
+    m_file->Seek(m_selected);
+    m_file->Write(m_buffer + bufferIndex, 1);
 }

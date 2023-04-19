@@ -10,20 +10,20 @@ class ConsoleBuffer
 
         bool IsInitialised() const;
         void Write(int x, int y, WORD attributes, const char* format, ...);
-		void SetAttributes(int x, int y, WORD attributes);
-		void DrawWindow(int x, int y, int width, int height, WORD colour);
+        void SetAttributes(int x, int y, WORD attributes);
+        void DrawWindow(int x, int y, int width, int height, WORD colour);
         void FillLine(int y, char c, WORD attributes);
         void FillRect(int x, int y, int width, int height, char c, WORD attributes);
         void Clear(WORD clearColour);
         void OnWindowResize(int width, int height);
         void Flush(bool fullDraw);
 
-		void SetCursor(bool visible, unsigned int size);
+        void SetCursor(bool visible, unsigned int size);
 
         int GetWidth() const;
         int GetHeight() const;
 
-		HANDLE GetStdoutHandle() const;
+        HANDLE GetStdoutHandle() const;
 
     private:
         int m_width;
@@ -50,5 +50,5 @@ inline int ConsoleBuffer::GetHeight() const
 
 inline HANDLE ConsoleBuffer::GetStdoutHandle() const
 {
-	return m_stdoutHandle;
+    return m_stdoutHandle;
 }
