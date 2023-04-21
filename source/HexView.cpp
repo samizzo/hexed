@@ -22,6 +22,7 @@ HexView::HexView(File* file)
 HexView::~HexView()
 {
     m_file->Close();
+    delete[] m_buffer;
 }
 
 void HexView::OnWindowRefreshed()
