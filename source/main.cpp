@@ -1,3 +1,9 @@
+#if defined(_DEBUG)
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif
+
 #include "MainWindow.h"
 #include "ConsoleBuffer.h"
 #include <stdio.h>
@@ -20,6 +26,9 @@ static void DisplayHelp()
 
 int main(int argc, char** argv)
 {
+#if defined(_DEBUG)
+    _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 
     std::unique_ptr<char> fnameBuffer;
     fnameBuffer = std::make_unique<char>(MAX_PATH);
