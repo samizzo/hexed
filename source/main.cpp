@@ -12,25 +12,44 @@ bool s_running = false;
 void ProcessInput(const INPUT_RECORD& inputRecord);
 void RemapColours(HANDLE stdoutHandle);
 
+static void DisplayHelp()
+{
+    printf("usage: hexed <filename>\n");
+}
+
 int main(int argc, char** argv)
 {
     char* fname = NULL;
     if (argc != 2)
     {
-        OPENFILENAME ofn;
-        ZeroMemory(&ofn, sizeof ofn);
-        ofn.lStructSize = sizeof ofn;
-        ofn.lpstrFilter = "All files\0*.*\0\0";
-        ofn.nFilterIndex = 1;
-        ofn.lpstrFile = fname = new char[MAX_PATH];
-        ofn.nMaxFile = MAX_PATH;
-        ofn.Flags = OFN_FILEMUSTEXIST | OFN_FORCESHOWHIDDEN;
-
-        *fname = '\0';
-        if (GetOpenFileName(&ofn) == FALSE)
+        char sshClient[1024];
+        char sshConnection[1024];
+        GetEnvironmentVariable("SSH_CLIENT", sshClient, sizeof(sshClient));
+        GetEnvironmentVariable("SSH_CONNECTION", sshConnection, sizeof(sshConnection));
+        if (strlen(sshClient) == 0 && strlen(sshConnection) == 0)
         {
-            printf("usage: hexed <filename>\n");
-            delete[] fname;
+            OPENFILENAME ofn;
+            ZeroMemory(&ofn, sizeof ofn);
+            ofn.lStructSize = sizeof ofn;
+            ofn.lpstrFilter = "All files\0*.*\0\0";
+            ofn.nFilterIndex = 1;
+            ofn.lpstrFile = fname = new char[MAX_PATH];
+            ofn.nMaxFile = MAX_PATH;
+            ofn.Flags = OFN_FILEMUSTEXIST | OFN_FORCESHOWHIDDEN;
+
+            *fname = '\0';
+            if (GetOpenFileName(&ofn) == FALSE)
+            {
+                DisplayHelp();
+                delete[] fname;
+                return 0;
+            }
+        }
+        else
+        {
+            // Running under an ssh connection so don't try to pop up an open file
+            // dialog. Just display the help text.
+            DisplayHelp();
             return 0;
         }
     }
