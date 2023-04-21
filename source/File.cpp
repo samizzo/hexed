@@ -38,7 +38,7 @@ bool File::Open(const char* path)
     if (m_handle != INVALID_HANDLE_VALUE)
         m_filesize = GetFileSize(m_handle, 0);
 
-    return m_handle != 0;
+    return m_handle != INVALID_HANDLE_VALUE;
 }
 
 bool File::IsOpen() const

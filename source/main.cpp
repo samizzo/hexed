@@ -60,6 +60,13 @@ int main(int argc, char** argv)
         fname = argv[1];
     }
 
+    File file;
+    if (!file.Open(fname))
+    {
+        printf("hexed: couldn't open '%s'\n", fname);
+        return 0;
+    }
+
     HANDLE stdinHandle = GetStdHandle(STD_INPUT_HANDLE);
     if (stdinHandle == INVALID_HANDLE_VALUE)
         Error("Couldn't get input handle");
@@ -83,8 +90,6 @@ int main(int argc, char** argv)
 
     ConsoleBuffer buffer(stdoutHandle);
     Window::SetConsoleBuffer(&buffer);
-    File file;
-    file.Open(fname);
     MainWindow mainWindow(&file);
 
     s_running = true;
