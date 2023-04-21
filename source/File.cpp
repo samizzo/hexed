@@ -16,14 +16,14 @@ File::~File()
     Close();
 }
 
-bool File::Open(const char* path)
+bool File::Open(const std::string& path)
 {
     m_readOnly = false;
 
     m_fullPath = new char[MAX_PATH];
-    GetFullPathName(path, MAX_PATH, m_fullPath, &m_filename);
+    GetFullPathName(path.c_str(), MAX_PATH, m_fullPath, &m_filename);
 
-    DWORD fileAttr = GetFileAttributes(path);
+    DWORD fileAttr = GetFileAttributes(path.c_str());
     if (fileAttr != INVALID_FILE_ATTRIBUTES)
         m_readOnly = (fileAttr & FILE_ATTRIBUTE_READONLY) != 0;
 
@@ -35,7 +35,7 @@ bool File::Open(const char* path)
         shareMode |= FILE_SHARE_DELETE | FILE_SHARE_WRITE;
     }
 
-    m_handle = CreateFile(path, access, shareMode, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    m_handle = CreateFile(path.c_str(), access, shareMode, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (m_handle != INVALID_HANDLE_VALUE)
         m_filesize = GetFileSize(m_handle, 0);
 

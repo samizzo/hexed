@@ -1,12 +1,14 @@
 #pragma once
 
+#include <string>
+
 class File
 {
     public:
         File();
         ~File();
 
-        bool Open(const char* path);
+        bool Open(const std::string& path);
         void Close();
         unsigned int GetSize() const;
         void Seek(unsigned int position);

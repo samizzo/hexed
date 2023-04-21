@@ -8,7 +8,6 @@
 #include "ConsoleBuffer.h"
 #include <stdio.h>
 #include <string>
-#include <memory>
 #include "Error.h"
 #include "SaveRestoreConsole.h"
 
@@ -30,14 +29,12 @@ int main(int argc, char** argv)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 
-    std::unique_ptr<char> fnameBuffer;
-    fnameBuffer = std::make_unique<char>(MAX_PATH);
-    char* fname = fnameBuffer.get();
+    std::string fname;
 
     if (argc != 2)
     {
-        char sshClient[1024];
-        char sshConnection[1024];
+        char sshClient[1024] = { 0 };
+        char sshConnection[1024] = { 0 };
         GetEnvironmentVariable("SSH_CLIENT", sshClient, sizeof(sshClient));
         GetEnvironmentVariable("SSH_CONNECTION", sshConnection, sizeof(sshConnection));
         if (strlen(sshClient) == 0 && strlen(sshConnection) == 0)
@@ -47,7 +44,8 @@ int main(int argc, char** argv)
             ofn.lStructSize = sizeof ofn;
             ofn.lpstrFilter = "All files\0*.*\0\0";
             ofn.nFilterIndex = 1;
-            ofn.lpstrFile = fname;
+            fname.resize(MAX_PATH);
+            ofn.lpstrFile = fname.data();
             ofn.nMaxFile = MAX_PATH;
             ofn.Flags = OFN_FILEMUSTEXIST | OFN_FORCESHOWHIDDEN;
             if (GetOpenFileName(&ofn) == FALSE)
@@ -72,7 +70,7 @@ int main(int argc, char** argv)
     File file;
     if (!file.Open(fname))
     {
-        printf("hexed: couldn't open '%s'\n", fname);
+        printf("hexed: couldn't open '%s'\n", fname.c_str());
         return 0;
     }
 
