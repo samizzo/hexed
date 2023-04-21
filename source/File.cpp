@@ -13,6 +13,7 @@ File::File()
 File::~File()
 {
     delete[] m_fullPath;
+    Close();
 }
 
 bool File::Open(const char* path)
@@ -48,10 +49,11 @@ bool File::IsOpen() const
 
 void File::Close()
 {
-    if (!m_handle)
+    if (!IsOpen())
         return;
 
     CloseHandle(m_handle);
+    m_handle = INVALID_HANDLE_VALUE;
 }
 
 void File::Seek(unsigned int position)
