@@ -2,6 +2,7 @@
 #include "ConsoleBuffer.h"
 #include <stdio.h>
 #include <string>
+#include <memory>
 #include "Error.h"
 #include "SaveRestoreConsole.h"
 
@@ -19,7 +20,11 @@ static void DisplayHelp()
 
 int main(int argc, char** argv)
 {
-    char* fname = NULL;
+
+    std::unique_ptr<char> fnameBuffer;
+    fnameBuffer = std::make_unique<char>(MAX_PATH);
+    char* fname = fnameBuffer.get();
+
     if (argc != 2)
     {
         char sshClient[1024];
@@ -33,15 +38,12 @@ int main(int argc, char** argv)
             ofn.lStructSize = sizeof ofn;
             ofn.lpstrFilter = "All files\0*.*\0\0";
             ofn.nFilterIndex = 1;
-            ofn.lpstrFile = fname = new char[MAX_PATH];
+            ofn.lpstrFile = fname;
             ofn.nMaxFile = MAX_PATH;
             ofn.Flags = OFN_FILEMUSTEXIST | OFN_FORCESHOWHIDDEN;
-
-            *fname = '\0';
             if (GetOpenFileName(&ofn) == FALSE)
             {
                 DisplayHelp();
-                delete[] fname;
                 return 0;
             }
         }
@@ -119,8 +121,6 @@ int main(int argc, char** argv)
     }
 
     RestoreConsole(stdoutHandle, stdoutHandle);
-    if (fname != argv[1])
-        delete[] fname;
 }
 
 void ProcessInput(const INPUT_RECORD& inputRecord)
