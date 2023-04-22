@@ -17,6 +17,8 @@ HexView::HexView(File* file)
     assert(file);
     if (m_file->IsOpen())
         m_fileSize = m_file->GetSize();
+
+    s_consoleBuffer->SetCursor(false, 1);
 }
 
 HexView::~HexView()
