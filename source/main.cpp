@@ -10,6 +10,7 @@
 #include <string>
 #include "Error.h"
 #include "SaveRestoreConsole.h"
+#include "Log.h"
 
 using namespace std;
 
@@ -25,6 +26,8 @@ static void DisplayHelp()
 
 int main(int argc, char** argv)
 {
+    LogDebug("main\n");
+
 #if defined(_DEBUG)
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
